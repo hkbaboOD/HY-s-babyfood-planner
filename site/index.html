@@ -240,7 +240,12 @@ main.stack > .sub{margin:-6px 16px 0}
 <div class="scrim" id="scrim"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+/* ▼ Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에서 복사한 firebaseConfig 를 여기에 붙여 넣으세요 */
+const FIREBASE_CONFIG = null;
+/* ▲ */
 (function(){
 "use strict";
 /* ---------- reference lists (드롭다운 선택지) ---------- */
@@ -271,7 +276,7 @@ const OPTS={
   allergy:ALLERGENS.slice()
 };
 
-const state={family:null,offline:false,syncing:false,lastSync:null,cubes:new Map(),plan:new Map(),settings:null,tab:"plan",range:null,showGone:false,mode:"loading",cubeLayout:"table",win:"14",scrollToday:true};
+const state={family:null,offline:false,cubes:new Map(),plan:new Map(),settings:null,tab:"plan",range:null,showGone:false,mode:"loading",cubeLayout:"table",win:"14",scrollToday:true};
 try{const L=JSON.parse(localStorage.getItem(LS_KEY+"-ui")||"null");if(L){if(L.cubeLayout)state.cubeLayout=L.cubeLayout;if(L.win)state.win=L.win}}catch(e){}
 let db=null, D=null; // D = derived data for current render
 
@@ -366,83 +371,31 @@ function derive(){
   D={t,idx,rem,days,all,cum,shortCells,firstShort,lastOk,needWin,needAll,aIdx,aStats,firsts};
 }
 
-/* ---------- storage: 비공개 GitHub 저장소의 data.json 하나 ----------
-   { cubes:{id:doc}, plan:{date:doc}, settings:{...} }
-   바뀐 문서만 ops 에 모았다가 2초 뒤 한 번에 커밋. 다른 기기가 먼저 커밋했으면(409) 받아서 다시 합친 뒤 커밋 */
-const GH_KEY=LS_KEY+"-github", CACHE_KEY=LS_KEY+"-cache";
-let gh=null; // {owner, repo, token}
-let remote={sha:null,etag:null,data:{cubes:{},plan:{},settings:null}};
-const ops=new Map(); let flushT=null, flushing=false;
+/* ---------- storage (Firebase Firestore: families/{가족코드}/...) ---------- */
 function strip(o){const r={};for(const k in o){if(k!=="id")r[k]=o[k]}return r}
 function mapOf(col){return col==="cubes"?state.cubes:state.plan}
-function b64e(str){const bytes=new TextEncoder().encode(str);let bin="";for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(bin)}
-function b64d(b64){const bin=atob(String(b64).replace(/\s/g,""));const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
-function emptyData(){return {cubes:{},plan:{},settings:null}}
-function normData(d){d=d||{};return {cubes:d.cubes||{},plan:d.plan||{},settings:d.settings||null}}
-function ghUrl(){return "https://api.github.com/repos/"+encodeURIComponent(gh.owner)+"/"+encodeURIComponent(gh.repo)+"/contents/data.json"}
-function ghFetch(method,body,extra){
-  const headers=Object.assign({"Authorization":"Bearer "+gh.token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"},extra||{});
-  if(body)headers["Content-Type"]="application/json";
-  return fetch(ghUrl(),{method,cache:"no-store",headers,body:body?JSON.stringify(body):undefined});
-}
-function httpErr(r){const e=new Error("HTTP "+r.status);e.status=r.status;return e}
-async function pull(){
-  const r=await ghFetch("GET",null,remote.etag?{"If-None-Match":remote.etag}:null);
-  if(r.status===304)return false;
-  if(r.status===404){remote={sha:null,etag:null,data:emptyData()};return true}
-  if(!r.ok)throw httpErr(r);
-  const j=await r.json();
-  remote.sha=j.sha;remote.etag=r.headers.get("ETag");
-  remote.data=normData(j.content?JSON.parse(b64d(j.content)):{});
-  return true;
-}
-function applyOps(d){ops.forEach((v,k)=>{const i=k.indexOf("/"),col=k.slice(0,i),id=k.slice(i+1);if(col==="settings")d.settings=v;else if(v===null)delete d[col][id];else d[col][id]=v})}
-function applyRemote(){
-  const d=clone(remote.data);applyOps(d);
-  state.cubes=new Map(Object.entries(d.cubes).map(([id,o])=>[id,Object.assign({},o,{id})]));
-  state.plan=new Map(Object.entries(d.plan).map(([id,o])=>[id,Object.assign({},o,{id})]));
-  state.settings=d.settings?Object.assign({},d.settings,{id:"main"}):null;
-}
-function saveCache(){try{localStorage.setItem(CACHE_KEY,JSON.stringify({remote,ops:[...ops.entries()]}))}catch(e){}}
-function loadCache(){try{const j=JSON.parse(localStorage.getItem(CACHE_KEY)||"null");if(j){remote=j.remote||remote;remote.data=normData(remote.data);(j.ops||[]).forEach(([k,v])=>ops.set(k,v))}}catch(e){}}
-function queue(k,v){ops.set(k,v);saveCache();clearTimeout(flushT);flushT=setTimeout(flush,1800)}
+function refOf(col,id){return db.collection(col).doc(id)}
 function save(col,obj){
-  if(col==="settings"){state.settings=obj;queue("settings/main",strip(obj));return}
-  mapOf(col).set(obj.id,obj);queue(col+"/"+obj.id,strip(JSON.parse(JSON.stringify(obj))));
+  if(col==="settings")state.settings=obj;else mapOf(col).set(obj.id,obj);
+  if(state.mode==="db"||state.mode==="slow")refOf(col,obj.id).set(strip(JSON.parse(JSON.stringify(obj)))).catch(fail);else saveLocal();
 }
-function remove(col,id){mapOf(col).delete(id);queue(col+"/"+id,null)}
-function stamp(){const d=new Date();return ymd(d)+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
-async function flush(){
-  if(!gh||flushing||!ops.size)return;
-  flushing=true;state.syncing=true;renderSync();
-  const batch=new Map(ops);let ok=false;
-  try{
-    for(let attempt=0;attempt<5&&!ok;attempt++){
-      const d=clone(remote.data);batch.forEach((v,k)=>{const i=k.indexOf("/"),col=k.slice(0,i),id=k.slice(i+1);if(col==="settings")d.settings=v;else if(v===null)delete d[col][id];else d[col][id]=v});
-      const body={message:"이유식 기록 "+stamp()+" ("+batch.size+"건)",content:b64e(JSON.stringify(d))};
-      if(remote.sha)body.sha=remote.sha;
-      const r=await ghFetch("PUT",body);
-      if(r.status===409||r.status===422){remote.etag=null;await pull();continue}
-      if(!r.ok)throw httpErr(r);
-      const j=await r.json();remote.sha=j.content.sha;remote.etag=null;remote.data=d;ok=true;
-    }
-    if(ok){batch.forEach((v,k)=>{if(ops.get(k)===v)ops.delete(k)});state.offline=false;state.lastSync=Date.now()}
-  }catch(e){state.offline=true;netFail(e)}
-  flushing=false;state.syncing=false;saveCache();applyRemote();render();
-  if(ops.size){clearTimeout(flushT);flushT=setTimeout(flush,ok?800:15000)}
+function remove(col,id){
+  mapOf(col).delete(id);
+  if(state.mode==="db"||state.mode==="slow")refOf(col,id).delete().catch(fail);else saveLocal();
 }
-function netFail(e){
-  const s=e&&e.status;
-  if(s===401)toast("GitHub 토큰이 만료됐거나 틀렸어요. 설정에서 다시 연결해 주세요.");
-  else if(s===403||s===404)toast("저장소에 쓸 권한이 없어요. 토큰의 저장소·권한(Contents 읽기/쓰기)을 확인해 주세요.");
-  else if(s)toast("저장하지 못했어요 (GitHub "+s+"). 잠시 뒤 다시 시도해요.");
-  else toast("오프라인이에요. 연결되면 자동으로 저장돼요.");
+function fail(e){
+  const code=e&&e.code;
+  if(code==="permission-denied")toast("저장 권한이 없어요. Firebase 보안 규칙을 확인해 주세요.");
+  else if(code==="resource-exhausted")toast("오늘 무료 사용량을 넘었어요. 내일 다시 저장돼요.");
+  else toast("저장하지 못했어요. 인터넷 연결을 확인해 주세요.");
 }
-async function sync(){
-  if(!gh||flushing)return;
-  try{const ch=await pull();state.offline=false;state.lastSync=Date.now();if(ch){applyRemote();saveCache();render()}else renderSync()}
-  catch(e){state.offline=true;renderSync();if(e&&e.status===401)netFail(e)}
-  if(ops.size)flush();
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify({cubes:[...state.cubes.values()],plan:[...state.plan.values()],settings:state.settings}))}catch(e){}}
+function loadLocal(){try{const j=JSON.parse(localStorage.getItem(LS_KEY)||"null");if(j){(j.cubes||[]).forEach(c=>state.cubes.set(c.id,c));(j.plan||[]).forEach(p=>state.plan.set(p.id,p));state.settings=j.settings||null}}catch(e){}}
+function applySnap(col,snap){
+  if(col==="settings"){const d=snap.docs.find(x=>x.id==="main");state.settings=d?Object.assign({},d.data(),{id:"main"}):null;return}
+  const map=new Map();
+  snap.docs.forEach(d=>map.set(d.id,Object.assign({},d.data(),{id:d.id})));
+  if(col==="cubes")state.cubes=map;else state.plan=map;
 }
 /* 백업 내보내기 / 불러오기 */
 function backupObj(){return {app:"babyfood-planner",version:1,exportedAt:new Date().toISOString(),settings:state.settings?strip(state.settings):null,cubes:[...state.cubes.values()],plan:[...state.plan.values()]}}
@@ -452,10 +405,16 @@ function downloadBackup(){
 }
 async function importBackup(j){
   if(!j||!Array.isArray(j.cubes)||!Array.isArray(j.plan))throw new Error("형식이 맞지 않는 파일이에요");
-  if(j.settings)save("settings",Object.assign({},j.settings,{id:"main"}));
-  j.cubes.forEach(c=>save("cubes",c));
-  j.plan.forEach(p=>save("plan",Object.assign({},p,{id:p.id||p.date})));
-  clearTimeout(flushT);flush();
+  if(state.mode==="db"||state.mode==="slow"){
+    const fs=firebase.firestore();let batch=fs.batch(),n=0;const commits=[];
+    const put=(col,id,data)=>{batch.set(refOf(col,id),data);if(++n%400===0){commits.push(batch.commit());batch=fs.batch()}};
+    if(j.settings)put("settings","main",strip(j.settings));
+    j.cubes.forEach(c=>put("cubes",c.id,strip(c)));
+    j.plan.forEach(p=>put("plan",p.id||p.date,strip(p)));
+    commits.push(batch.commit());await Promise.all(commits);
+  }else{
+    j.cubes.forEach(c=>state.cubes.set(c.id,c));j.plan.forEach(p=>state.plan.set(p.id||p.date,Object.assign({},p,{id:p.id||p.date})));if(j.settings)state.settings=Object.assign({},j.settings,{id:"main"});saveLocal();
+  }
   return j.cubes.length+j.plan.length;
 }
 function saveUi(){try{localStorage.setItem(LS_KEY+"-ui",JSON.stringify({cubeLayout:state.cubeLayout,win:state.win}))}catch(e){}}
@@ -493,24 +452,20 @@ function setDefaultN(n){
 }
 
 /* ---------- render ---------- */
-function renderSync(){
-  const s=document.getElementById("sync");if(!s)return;
-  if(!gh){s.textContent="연결 필요";s.className="sync local";return}
-  if(state.syncing){s.textContent="저장 중…";s.className="sync";return}
-  if(state.offline){s.textContent="오프라인"+(ops.size?" · "+ops.size+"건 대기":"");s.className="sync local";return}
-  if(ops.size){s.textContent=ops.size+"건 저장 대기";s.className="sync";return}
-  s.textContent=state.lastSync?"가족과 동기화됨":"불러오는 중";s.className="sync";
-}
 function render(){
   derive();
   const t=D.t;
-  if(!gh){renderWelcome();return}
+  if(!state.family){renderWelcome();return}
   const bn=S().babyName;let title="우리 아기 이유식";
   if(bn){const c=bn.charCodeAt(bn.length-1);title=bn+(c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28?"이":"")+" 이유식"}
   document.getElementById("fab").style.visibility="";document.getElementById("settingsBtn").style.visibility="";
   document.getElementById("appTitle").textContent=title;document.getElementById("navTitle").textContent=title;document.title=title;
   document.getElementById("todayLabel").textContent=["오늘 "+md(t),ageLabel(t),dayLabel(t)].filter(Boolean).join(" · ");
-  renderSync();
+  const s=document.getElementById("sync");
+  if(state.mode==="db"){s.textContent=state.offline?"오프라인 · 연결되면 저장":"가족과 공유 중";s.className="sync"+(state.offline?" local":"")}
+  else if(state.mode==="local"){s.textContent="이 기기에만 저장";s.className="sync local"}
+  else if(state.mode==="slow"){s.textContent="연결 지연 중";s.className="sync local"}
+  else{s.textContent="불러오는 중";s.className="sync"}
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===state.tab));
   const v=document.getElementById("view");
   v.innerHTML=state.tab==="plan"?viewPlan():state.tab==="cube"?viewCube():state.tab==="stock"?viewStock():viewAllergy();
@@ -747,13 +702,12 @@ function drawSettings(){
     s.stages.map((st,i)=>'<div class="field stage"><input aria-label="단계 이름" data-st="'+i+'" data-sk="name" value="'+esc(st.name)+'" placeholder="단계 이름 (예: 후기)"><input type="date" aria-label="시작일" data-st="'+i+'" data-sk="start" value="'+esc(st.start||"")+'"><button type="button" class="icon-btn" style="color:var(--bad)" data-f="rmstage" data-i="'+i+'" aria-label="단계 삭제">⊖</button></div>').join("")+
     '<button type="button" class="rowbtn" data-f="addstage">단계 추가</button></div>'+
     '<div class="sub" style="margin:6px 16px 0">DAY 번호와 식단표의 "초기 30일·중기 30일" 범위에 쓰여요.</div></div>'+
-    '<div><div class="grouphead">가족 공유 · GitHub '+esc(gh?gh.owner+"/"+gh.repo:"")+'</div><div class="group">'+
+    '<div><div class="grouphead">가족 공유</div><div class="group">'+
     '<button type="button" class="rowbtn" data-f="invite">가족 초대 링크 복사</button>'+
-    '<button type="button" class="rowbtn" data-f="syncnow">지금 동기화'+(state.lastSync?' <span class="sub">(마지막 '+new Date(state.lastSync).toTimeString().slice(0,5)+')</span>':'')+'</button>'+
     '<button type="button" class="rowbtn" data-f="export">백업 파일 내보내기</button>'+
     '<label class="rowbtn" style="cursor:pointer">백업 파일 불러오기<input type="file" id="s-import" accept="application/json,.json" style="display:none"></label>'+
-    '<button type="button" class="rowbtn danger" data-f="leave">'+(form.confirmLeave?"한 번 더 누르면 연결을 끊어요":"이 기기에서 연결 끊기")+'</button></div>'+
-    '<div class="sub" style="margin:6px 16px 0">초대 링크에는 저장소 열쇠(토큰)가 들어 있어요. 받은 사람은 로그인 없이 같은 기록을 보고 고칠 수 있으니 가족에게만 보내 주세요. 모든 기록은 저장소에 커밋으로 남아서 실수해도 되돌릴 수 있어요.</div></div></div>';
+    '<button type="button" class="rowbtn danger" data-f="leave">'+(form.confirmLeave?"한 번 더 누르면 이 기기에서 나가요":"이 기기에서 가족 공간 나가기")+'</button></div>'+
+    '<div class="sub" style="margin:6px 16px 0">초대 링크를 받은 사람은 로그인 없이 같은 식단·큐브를 보고 체크할 수 있어요. 링크는 가족에게만 보내 주세요.</div></div></div>';
   openSheet(h);
 }
 function collectSettings(){
@@ -813,9 +767,8 @@ sheet.addEventListener("click",e=>{
     if(f==="addstage"){form.s.stages.push({name:"",start:""});drawSettings();return}
     if(f==="rmstage"){form.s.stages.splice(+b.dataset.i,1);drawSettings();return}
     if(f==="invite"){copyInvite();return}
-    if(f==="syncnow"){sync().then(()=>toast("동기화했어요"));return}
     if(f==="export"){downloadBackup();toast("백업 파일을 저장했어요");return}
-    if(f==="leave"){if(!form.confirmLeave){form.confirmLeave=true;b.textContent="한 번 더 누르면 이 기기에서 나가요";return}try{localStorage.removeItem(GH_KEY);localStorage.removeItem(CACHE_KEY)}catch(e){}location.href=location.pathname;return}
+    if(f==="leave"){if(!form.confirmLeave){form.confirmLeave=true;b.textContent="한 번 더 누르면 이 기기에서 나가요";return}try{localStorage.removeItem(LS_KEY+"-family")}catch(e){}location.href=location.pathname;return}
     if(f==="savesettings"){const s=form.s;s.stages=s.stages.filter(x=>x.name&&x.start);save("settings",Object.assign({},s,{id:"main"}));state.range=null;closeSheet();render();toast("설정을 저장했어요");return}
     return;
   }
@@ -862,65 +815,52 @@ document.getElementById("settingsBtn").addEventListener("click",settingsSheet);
 /* ---------- boot ---------- */
 window.addEventListener("scroll",()=>{document.getElementById("navbar").classList.toggle("scrolled",window.scrollY>40)},{passive:true});
 render();
-/* ---------- 연결 (처음 1회) ---------- */
-function loadGh(){try{const j=JSON.parse(localStorage.getItem(GH_KEY)||"null");if(j&&j.owner&&j.repo&&j.token)return j}catch(e){}return null}
-function storeGh(g){try{localStorage.setItem(GH_KEY,JSON.stringify(g))}catch(e){}}
-function b64url(s){return b64e(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
-function unb64url(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return b64d(s)}
-function fromInviteHash(){
-  const m=location.hash.match(/[#&]c=([A-Za-z0-9_-]+)/);if(!m)return null;
-  try{const j=JSON.parse(unb64url(m[1]));history.replaceState(null,"",location.pathname);if(j.o&&j.r&&j.t)return {owner:j.o,repo:j.r,token:j.t}}catch(e){}
-  return null;
+/* 가족 코드: ?f=코드 로 들어오면 이 기기에 기억하고 주소창에서는 지워요 */
+function familyFromUrl(){
+  let f=null;try{const u=new URL(location.href);f=u.searchParams.get("f");if(f){localStorage.setItem(LS_KEY+"-family",f);history.replaceState(null,"",location.pathname)}else f=localStorage.getItem(LS_KEY+"-family")}catch(e){}
+  return f&&/^[A-Za-z0-9_-]{16,64}$/.test(f)?f:null;
 }
-function inviteUrl(){return location.origin+location.pathname+"#c="+b64url(JSON.stringify({o:gh.owner,r:gh.repo,t:gh.token}))}
+function newCode(){const a="abcdefghijkmnpqrstuvwxyz23456789";const r=new Uint32Array(24);crypto.getRandomValues(r);return Array.from(r,x=>a[x%a.length]).join("")}
+function inviteUrl(){return location.origin+location.pathname+"?f="+state.family}
 function copyInvite(){
   const url=inviteUrl();
-  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>toast("초대 링크를 복사했어요. 가족에게만 보내 주세요")).catch(()=>{
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>toast("초대 링크를 복사했어요. 가족에게 보내 주세요")).catch(()=>{
     if(navigator.share)navigator.share({title:"이유식 식단·큐브",url}).catch(()=>{});else window.prompt("이 링크를 복사해 가족에게 보내 주세요",url);
   });
 }
-function guessOwner(){const hn=location.hostname;return /\.github\.io$/i.test(hn)?hn.split(".")[0]:""}
 function renderWelcome(){
   document.getElementById("fab").style.visibility="hidden";document.getElementById("settingsBtn").style.visibility="hidden";
-  document.getElementById("todayLabel").textContent="";renderSync();
-  document.getElementById("view").innerHTML='<div class="group" style="padding:18px 16px"><b style="font-size:20px">기록 저장소 연결</b><p class="sub" style="font-size:15px;margin:8px 0 0">식단·큐브 기록은 비공개 GitHub 저장소에 저장돼요. 처음 한 번만 연결하면 돼요. 가족에게 초대 링크를 받았다면 그 링크로 열면 바로 연결돼요.</p></div>'+
-    '<div class="group"><div class="field"><label for="w-owner">GitHub 아이디</label><input id="w-owner" autocapitalize="off" autocorrect="off" value="'+esc(guessOwner())+'"></div>'+
-    '<div class="field"><label for="w-repo">저장소 이름</label><input id="w-repo" autocapitalize="off" autocorrect="off" value="babyfood-data"></div>'+
-    '<div class="field"><label for="w-token">토큰</label><input id="w-token" type="password" autocapitalize="off" autocorrect="off" placeholder="github_pat_…"></div>'+
-    '<button class="rowbtn" data-act="connect" style="font-weight:600">연결하기</button></div>'+
-    '<div class="sub" style="margin:-6px 16px 0">토큰은 이 기기에만 저장되고 GitHub 외에는 어디에도 보내지 않아요.</div>';
+  document.getElementById("todayLabel").textContent="";document.getElementById("sync").textContent=FIREBASE_CONFIG?"시작 전":"Firebase 설정 필요";
+  document.getElementById("view").innerHTML='<div class="group" style="padding:20px 16px"><b style="font-size:20px">가족 공간 만들기</b><p class="sub" style="font-size:15px;margin:8px 0 16px">식단표와 큐브 현황을 가족이 함께 쓰는 공간을 만들어요. 다른 가족이 이미 만들었다면 그 사람에게 받은 초대 링크로 들어오세요.</p>'+
+    '<button class="btn primary" data-act="create" style="width:100%;padding:12px">새 가족 공간 만들기</button></div>'+
+    '<div><div class="grouphead">초대 코드로 들어가기</div><div class="group"><div class="field"><label for="w-code">초대 코드</label><input id="w-code" placeholder="초대 링크의 f= 뒤 글자"></div><button class="rowbtn" data-act="join">들어가기</button></div></div>';
 }
-async function connect(g,isNew){
-  gh=g;loadCache();applyRemote();render();
-  try{
-    await pull();
-    if(!remote.sha){ // data.json 이 아직 없으면 빈 파일로 시작
-      const r=await ghFetch("PUT",{message:"이유식 기록 시작",content:b64e(JSON.stringify(emptyData()))});
-      if(!r.ok&&r.status!==422)throw httpErr(r);
-      if(r.ok){const j=await r.json();remote.sha=j.content.sha}
-    }
-    storeGh(gh);state.offline=false;state.lastSync=Date.now();applyRemote();saveCache();render();
-    if(isNew)toast("연결했어요. 이제 가족에게 초대 링크를 보내면 같이 쓸 수 있어요");
-    if(ops.size)flush();
-  }catch(e){
-    if(isNew){gh=null;render();toast(e&&e.status===401?"토큰이 맞지 않아요. 다시 확인해 주세요":e&&(e.status===404||e.status===403)?"저장소를 찾을 수 없거나 권한이 없어요. 아이디·저장소 이름·토큰 권한을 확인해 주세요":"연결하지 못했어요. 인터넷 연결을 확인해 주세요");return}
-    state.offline=true;render();netFail(e);
-  }
+function connect(code){
+  state.family=code;
+  if(!FIREBASE_CONFIG||!window.firebase){state.mode="local";loadLocal();render();if(!FIREBASE_CONFIG)toast("Firebase 설정이 없어 이 기기에만 저장돼요");return}
+  if(!firebase.apps.length){firebase.initializeApp(FIREBASE_CONFIG);try{firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}}
+  db=firebase.firestore().doc("families/"+code);
+  state.mode="loading";render();
+  const slowT=setTimeout(()=>{if(state.mode==="loading"){state.mode="slow";render()}},10000);
+  const got={};
+  ["cubes","plan","settings"].forEach(col=>{
+    db.collection(col).onSnapshot({includeMetadataChanges:false},snap=>{
+      applySnap(col,snap);got[col]=true;
+      if(got.cubes&&got.plan&&got.settings)clearTimeout(slowT);
+      state.offline=snap.metadata.fromCache;state.mode="db";render();
+    },err=>{clearTimeout(slowT);state.mode="local";loadLocal();render();toast(err&&err.code==="permission-denied"?"Firebase 보안 규칙 때문에 열 수 없어요. 규칙을 확인해 주세요.":"가족 공간에 연결하지 못했어요. 지금은 이 기기에만 저장돼요.")});
+  });
 }
 document.addEventListener("click",e=>{
-  const a=e.target.closest("[data-act=connect]");if(!a)return;
-  const g={owner:document.getElementById("w-owner").value.trim(),repo:document.getElementById("w-repo").value.trim(),token:document.getElementById("w-token").value.trim()};
-  if(!g.owner||!g.repo||!g.token){toast("세 칸을 모두 채워 주세요");return}
-  a.textContent="연결 중…";connect(g,true);
+  const a=e.target.closest("[data-act]");if(!a)return;
+  if(a.dataset.act==="create"){const c=newCode();try{localStorage.setItem(LS_KEY+"-family",c)}catch(err){}connect(c);
+    setTimeout(()=>{settingsSheet();toast("가족 공간을 만들었어요. 아기 이름·생년월일을 넣고, 백업이 있으면 불러오세요")},300)}
+  if(a.dataset.act==="join"){const v=(document.getElementById("w-code").value||"").trim().replace(/^.*[?&]f=/,"");if(!/^[A-Za-z0-9_-]{16,64}$/.test(v)){toast("초대 코드가 맞지 않아요. 링크를 다시 확인해 주세요");return}try{localStorage.setItem(LS_KEY+"-family",v)}catch(err){}connect(v)}
 });
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sync()});
-window.addEventListener("online",()=>sync());
-setInterval(()=>{if(document.visibilityState==="visible")sync()},15000);
-window.addEventListener("pagehide",()=>{saveCache()});
+window.addEventListener("online",()=>render());
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const inv=fromInviteHash();
-const g0=inv||loadGh();
-if(g0)connect(g0,!!inv);else render();
+const fam=familyFromUrl();
+if(fam)connect(fam);else render();
 })();
 </script>
 </body>
