@@ -310,7 +310,9 @@ function padM(p){const m=clone(p.m||[]);while(m.length<(p.n||1))m.push(emptyMeal
 function mealsOf(p){const n=p.n||1;const m=(p.m||[]).slice(0,n);while(m.length<n)m.push(emptyMeal());return m}
 function stagesSorted(){return (S().stages||[]).filter(s=>s.start).slice().sort((a,b)=>a.start.localeCompare(b.start))}
 function stageOf(ds){let st=null;stagesSorted().forEach(s=>{if(s.start<=ds)st=s});return st}
-function dayLabel(ds){const st=stageOf(ds);return st?st.name+" D"+(diffDays(st.start,ds)+1):""}
+function baseStage(n){return String(n||"").replace(/\s*\(\d+\)\s*$/,"")}
+/* 중기(1)·중기(2)처럼 같은 단계를 나눈 경우 DAY 번호를 이어서 셈 (중기(2) = 중기 D31~D60) */
+function dayLabel(ds){const st=stageOf(ds);if(!st)return "";const b=baseStage(st.name);const first=stagesSorted().find(s=>baseStage(s.name)===b)||st;return st.name+" D"+(diffDays(first.start,ds)+1)}
 function ageLabel(ds){const b=S().birth;if(!b)return "";return "생후 "+(diffDays(b,ds)+1)+"일"}
 
 /* ---------- item parsing → 재료 g → 큐브 ---------- */
@@ -508,7 +510,7 @@ function viewPlan(){
   let html='<div class="row between"><div class="row"><span class="sub">하루 이유식</span><div class="seg" role="group" aria-label="하루 끼니 수">'+
     [1,2].map(k=>'<button data-act="setn" data-n="'+k+'" class="'+(n===k?"on":"")+'" aria-pressed="'+(n===k)+'">'+k+'끼</button>').join("")+'</div></div>'+
     '<span class="sub">오늘부터 바뀌어요 · 날짜별로도 바꿀 수 있어요</span></div>';
-  html+='<div class="chips">'+sts.map(s=>'<button class="chipbtn'+(state.range==="stage:"+s.name?" on":"")+'" data-act="range" data-r="stage:'+esc(s.name)+'">'+esc(s.name)+' 30일</button>').join("")+
+  html+='<div class="chips">'+sts.map((s,i)=>{const nx=sts[i+1];const end=nx?addDays(nx.start,-1):null;const a=dayLabel(s.start).split(" D")[1];const z=end?dayLabel(end).split(" D")[1]:null;return '<button class="chipbtn'+(state.range==="stage:"+s.name?" on":"")+'" data-act="range" data-r="stage:'+esc(s.name)+'">'+esc(s.name)+' D'+a+(z?'~'+z:'~')+'</button>'}).join("")+
     '<button class="chipbtn'+(state.range==="week"?" on":"")+'" data-act="range" data-r="week">이번 주</button><button class="chipbtn'+(state.range==="all"?" on":"")+'" data-act="range" data-r="all">전체</button></div>';
   const shortSoon=[...D.firstShort.entries()].filter(([,x])=>x.date<=addDays(t,6));
   if(shortSoon.length)html+='<div class="notice"><b>일주일 안에 큐브가 모자라요.</b> '+shortSoon.map(([k,x])=>esc(labelKey(k))+' ('+mdShort(x.date)+' '+(x.i+1)+'끼부터)').join(", ")+'</div>';
