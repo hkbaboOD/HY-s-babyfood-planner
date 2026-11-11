@@ -1,5 +1,5 @@
 // 앱 화면 파일만 캐시해서 오프라인에서도 열리게 함 (기록 데이터는 GitHub API로 따로 동기화)
-const CACHE = "babyfood-shell-v3";
+const CACHE = "babyfood-shell-v4";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });

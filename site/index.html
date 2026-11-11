@@ -862,7 +862,7 @@ function connect(code){
   const slowT=setTimeout(()=>{if(state.mode==="loading"){state.mode="slow";render()}},10000);
   const got={};
   ["cubes","plan","settings"].forEach(col=>{
-    db.collection(col).onSnapshot({includeMetadataChanges:false},snap=>{
+    db.collection(col).onSnapshot({includeMetadataChanges:true},snap=>{
       applySnap(col,snap);got[col]=true;
       if(got.cubes&&got.plan&&got.settings)clearTimeout(slowT);
       state.offline=snap.metadata.fromCache;state.mode="db";render();
