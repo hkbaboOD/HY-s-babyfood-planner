@@ -258,7 +258,7 @@ const FIREBASE_CONFIG = {
 /* ---------- reference lists (드롭다운 선택지) ---------- */
 const GRAINS=["쌀","오트밀","밀","보리","현미"];
 const PROTEINS=["소고기","닭고기","두부","흰살생선","달걀"];
-const VEGS=["애호박","브로콜리","청경채","시금치","단호박","당근","감자","고구마","양배추","콜리플라워","무","가지","양파","배추","비트","토마토","파프리카","표고버섯","완두콩","옥수수"];
+const VEGS=["애호박","브로콜리","청경채","시금치","단호박","당근","감자","고구마","양배추","콜리플라워","무","가지","양파","배추","비트","토마토","파프리카","표고버섯","새송이버섯","양송이버섯","아욱","근대","연근","적채","완두콩","옥수수"];
 const FRUITS=["사과","배","단감","귤","키위","바나나","아보카도"];
 const ALLERGENS=["달걀","땅콩","밀","대두","생선","우유","참깨","메밀","새우","대게","조개","호두"];
 const ALIAS={"오트":"오트밀","계란":"달걀","콩":"대두"};
@@ -322,6 +322,7 @@ function parseItem(s){
   if(m){const parts=m[1].split("+").map(x=>norm(x)).filter(Boolean);const g=+m[2];return parts.map(p=>({name:p,g:Math.round(g/parts.length)}))}
   return [{name:norm(s),g:0}];
 }
+function allergensOf(m){return String(m.allergy||"").split(/[·,\/]/).map(s=>norm(s)).filter(a=>!isBlank(a))}
 function mealParts(m){return [].concat(parseItem(m.grain),parseItem(m.protein),...(m.veg||[]).map(parseItem))}
 function mealGrams(m){return mealParts(m).reduce((a,x)=>a+x.g,0)}
 function sizeIndex(){
@@ -364,10 +365,11 @@ function derive(){
   // 알레르기 노출 (지난 날짜 식단 + 체크된 식단 = 먹은 것으로)
   const aIdx=new Map(),aStats=new Map();
   all.forEach(x=>{
-    const a=norm(x.m.allergy);if(isBlank(a))return;
-    if(!aStats.has(a))aStats.set(a,[]);
-    const list=aStats.get(a);list.push({date:x.date,i:x.i,ate:x.m.done||x.date<t});
-    aIdx.set(x.date+"#"+x.i,list.length);
+    allergensOf(x.m).forEach(a=>{
+      if(!aStats.has(a))aStats.set(a,[]);
+      const list=aStats.get(a);list.push({date:x.date,i:x.i,ate:x.m.done||x.date<t});
+      aIdx.set(x.date+"#"+x.i+"#"+a,list.length);
+    });
   });
   // 재료 첫 등장
   const firsts=new Map();
@@ -519,10 +521,9 @@ function viewPlan(){
     if(!p){html+='<tr id="row-'+ds+'" class="mrow blank'+rc+'" data-act="day" data-d="'+ds+'">'+dcell+'<td colspan="7">식단 없음 · 눌러서 추가</td></tr>';continue}
     const ms=mealsOf(p);
     ms.forEach((m,i)=>{
-      const ai=D.aIdx.get(ds+"#"+i);
       const etc=[];
       if(!isBlank(m.fruit))etc.push('<span class="ln">'+esc(m.fruit)+'</span>');
-      if(!isBlank(m.allergy))etc.push('<span class="pill '+(ai===1?"bad":"honey")+'">'+esc(norm(m.allergy))+' '+(ai===1?"첫 도입":ai+"회")+'</span>');
+      allergensOf(m).forEach(a=>{const ai=D.aIdx.get(ds+"#"+i+"#"+a);etc.push('<span class="pill '+(ai===1?"bad":"honey")+'">'+esc(a)+' '+(ai===1?"첫 도입":ai+"회")+'</span>')});
       if(!isBlank(m.newFood))etc.push('<span class="pill accent">새 재료 '+esc(m.newFood)+'</span>');
       if(m.ate)etc.push('<span class="sub">먹은 양 '+esc(m.ate)+'g</span>');
       if(m.memo)etc.push('<span class="sub">'+esc(m.memo)+'</span>');
