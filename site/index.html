@@ -6,227 +6,234 @@
 <title>이유식 식단·큐브</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="이유식">
-<meta name="theme-color" content="#FBF8F2">
+<meta name="theme-color" content="#f2f2f7">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 엑셀 플래너 디자인: 크림 종이 + 연녹색 제목 띠 + 1끼 초록 / 2끼 분홍 블록 + 노란 입력 칸 */
+/* iOS 느낌: 시스템 글꼴, 그룹형 인셋 목록, 세그먼트 컨트롤, 반투명 내비·탭바, 모달 시트 */
 :root{
-  --paper:#FBF8F2; --sheet:#FFFFFF; --ink:#3F3A36; --muted:#8A8178; --muted2:#B5ADA2; --line:#D8D2C8; --hair:#ECE6DC;
-  --title-f:#EEF4EF; --title-t:#405848; --lab-f:#EEF3ED; --lab-t:#405848; --val-f:#FFF4C7; --val-t:#5D5140; --misc-f:#F8F2E9; --misc-t:#705E4D;
-  --note-f:#FFF8E8; --note-t:#6B5B43; --dayh-f:#F2EFEA; --dayh-t:#514B45; --day-f:#FAF9F7;
-  --g1h-f:#DDEADF; --g1h-t:#4F6A57; --c1-f:#F1F6F2; --c1-t:#52655A; --a1h-f:#FFF4D8; --m1-f:#FFFFFF; --a1-f:#F7F3EA; --gg1-f:#EDF5E8; --gg1-t:#50664F;
-  --g2h-f:#F2E1DE; --g2h-t:#7B5F59; --c2-f:#FBF1EF; --c2-t:#775E59; --a2h-f:#F3EAF7; --m2-f:#FFFEFD; --a2-f:#F6EFF3; --gg2-f:#F7ECE9; --gg2-t:#775E59;
-  --new-f:#FFE7A3; --sec-f:#DDEADF; --sec-t:#355C48; --th-f:#EEF5EF; --th-t:#405848; --th-b:#A9BDAE; --first-t:#6B5420;
-  --peach:#F6D8C9; --shop-f:#EAF1EA; --stock-f:#FBECE4; --cat-f:#F7F5F2; --row-f:#FFFDFB;
-  --good:#2E7D4F; --good-f:#E3F2E8; --bad:#B93A12; --bad-f:#FBE4DC; --warn:#A86B00; --warn-f:#FBEFD3; --blue:#1F4FD1; --blue-f:#D6E4FF;
-  --font:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR",system-ui,sans-serif;
+  --bg:#f2f2f7; --card:#ffffff; --ink:#000000; --muted:rgba(60,60,67,.6); --muted2:rgba(60,60,67,.3); --line:rgba(60,60,67,.18);
+  --fill:rgba(118,118,128,.12); --thumb:#ffffff; --bar-bg:rgba(249,249,249,.88);
+  --accent:#007aff; --accent-soft:rgba(0,122,255,.12);
+  --good:#248a3d; --good-tint:rgba(52,199,89,.14); --good-solid:#34c759;
+  --warn:#c93400; --warn-tint:rgba(255,149,0,.16);
+  --bad:#d70015; --bad-tint:rgba(255,59,48,.12);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
   color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --muted:rgba(235,235,245,.6); --muted2:rgba(235,235,245,.3); --line:rgba(84,84,88,.65);
+    --fill:rgba(118,118,128,.24); --thumb:#636366; --bar-bg:rgba(22,22,24,.86);
+    --accent:#0a84ff; --accent-soft:rgba(10,132,255,.2);
+    --good:#30d158; --good-tint:rgba(48,209,88,.16); --good-solid:#30d158;
+    --warn:#ff9f0a; --warn-tint:rgba(255,159,10,.18);
+    --bad:#ff453a; --bad-tint:rgba(255,69,58,.18);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --muted:rgba(235,235,245,.6); --muted2:rgba(235,235,245,.3); --line:rgba(84,84,88,.65);
+  --fill:rgba(118,118,128,.24); --thumb:#636366; --bar-bg:rgba(22,22,24,.86);
+  --accent:#0a84ff; --accent-soft:rgba(10,132,255,.2);
+  --good:#30d158; --good-tint:rgba(48,209,88,.16); --good-solid:#30d158;
+  --warn:#ff9f0a; --warn-tint:rgba(255,159,10,.18);
+  --bad:#ff453a; --bad-tint:rgba(255,69,58,.18);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-button,input,select{font:inherit;color:inherit}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.35;letter-spacing:-.2px;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit;letter-spacing:inherit}
 button{cursor:pointer}
-:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
-/* 상단 도구줄 */
-.navbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;height:calc(44px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0;background:rgba(251,248,242,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid transparent}
+/* nav bar + large title */
+.navbar{position:sticky;top:0;z-index:6;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:calc(44px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 8px 0;background:var(--bar-bg);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid transparent;transition:border-color .2s}
 .navbar.scrolled{border-bottom-color:var(--line)}
-.navbtn{border:1px solid var(--line);background:var(--sheet);color:var(--title-t);font-size:14px;font-weight:600;padding:5px 12px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
-.navbtn svg{width:18px;height:18px}
-.navtitle{font-size:15px;font-weight:700;color:var(--title-t);opacity:0;transition:opacity .2s}
+.navbtn{border:0;background:transparent;color:var(--accent);font-size:17px;padding:8px;justify-self:start;display:inline-flex;align-items:center}
+.navbtn.plus{justify-self:end}
+.navbtn svg{width:24px;height:24px}
+.navtitle{font-size:17px;font-weight:600;opacity:0;transition:opacity .2s}
 .navbar.scrolled .navtitle{opacity:1}
-.wrap{max-width:1400px;margin:0 auto;padding:6px 12px calc(76px + env(safe-area-inset-bottom))}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+header.large{padding:2px 4px 14px}
+h1{font-size:34px;font-weight:700;letter-spacing:.4px;line-height:1.2;margin:0}
+.sub{color:var(--muted);font-size:13px;letter-spacing:-.08px}
+.hmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}
+.sync{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.sync.local{background:var(--warn-tint);color:var(--warn)}
 
-/* 제목 띠 + 정보 줄 (엑셀 2~4행) */
-.xhead{border:2px solid #7D8B80;background:var(--sheet);margin-bottom:12px}
-.titleband{background:var(--title-f);color:var(--title-t);text-align:center;padding:10px 8px}
-.titleband h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.3px}
-.inforow{display:flex;flex-wrap:wrap;border-top:1px solid var(--line);background:#FBF8F2}
-.icell{display:flex;align-items:stretch;border-right:1px solid var(--line);min-height:38px}
-.icell .il{background:var(--lab-f);color:var(--lab-t);font-weight:700;font-size:12px;padding:4px 10px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2}
-.icell .iv{background:var(--val-f);color:var(--val-t);font-weight:700;padding:4px 12px;display:flex;align-items:center;font-variant-numeric:tabular-nums}
-.icell .iv.misc{background:var(--misc-f);color:var(--misc-t)}
-.noteband{background:var(--note-f);color:var(--note-t);font-size:12px;text-align:center;padding:6px 8px;border-top:1px solid var(--line)}
-.sync{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--good-f);color:var(--good);margin-left:6px;white-space:nowrap}
-.sync.local{background:var(--warn-f);color:var(--warn)}
-
-/* 공통 */
-.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:10px;padding:14px 16px}
+.stack{display:flex;flex-direction:column;gap:14px}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .between{justify-content:space-between}
-.sub{color:var(--muted);font-size:12px}
-.card{background:var(--sheet);border:1px solid var(--line);padding:14px 16px}
-.empty{color:var(--muted);text-align:center;padding:26px 12px}
-.notice{background:var(--bad-f);border:1px solid #EFC3B3;padding:8px 12px;font-size:13px}
-.notice b{color:var(--bad)}
-.btn{border:1px solid var(--line);background:var(--sheet);color:var(--title-t);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600}
-.btn.primary{background:var(--title-t);border-color:var(--title-t);color:#fff}
-.btn.small{padding:4px 10px;font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.pill.good{background:var(--good-tint);color:var(--good)}
+.pill.warn,.pill.honey{background:var(--warn-tint);color:var(--warn)}
+.pill.bad{background:var(--bad-tint);color:var(--bad)}
+.pill.muted{background:var(--fill);color:var(--muted)}
+.pill.accent{background:var(--accent-soft);color:var(--accent)}
+.btn{border:0;background:var(--fill);color:var(--accent);border-radius:99px;padding:7px 14px;font-size:15px;font-weight:600}
+.btn.primary{background:var(--accent);color:#fff}
 .btn.danger{color:var(--bad)}
-.icon-btn{border:0;background:transparent;width:30px;height:30px;color:var(--title-t)}
-.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;white-space:nowrap}
-.pill.good{background:var(--good-f);color:var(--good)} .pill.warn,.pill.honey{background:var(--warn-f);color:var(--warn)} .pill.bad{background:var(--bad-f);color:var(--bad)} .pill.muted{background:var(--hair);color:var(--muted)} .pill.accent{background:var(--blue-f);color:var(--blue)}
-.seg{display:inline-flex;border:1px solid var(--line);background:var(--sheet);border-radius:6px;overflow:hidden}
-.seg button{border:0;background:transparent;padding:5px 12px;font-size:13px;color:var(--muted);font-weight:600}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button.on{background:var(--val-f);color:var(--val-t)}
-.band{padding:7px 10px;font-weight:800;font-size:15px;text-align:center}
-.band.sec{background:var(--sec-f);color:var(--sec-t)} .band.peach{background:var(--peach);color:#3F3733;font-size:17px;padding:10px} .band.shop{background:var(--shop-f);color:#3F3733} .band.stock{background:var(--stock-f);color:#3F3733} .band.title{background:var(--title-f);color:var(--title-t);font-size:17px;padding:10px}
-.panel{background:var(--sheet);border:1px solid var(--line)}
-.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-/* 단계 = 엑셀 시트 탭 모양 */
-.stabs{display:flex;gap:2px;overflow-x:auto;border-bottom:2px solid var(--line);scrollbar-width:none}
-.stab{border:1px solid var(--line);border-bottom:0;background:#F1EDE6;color:var(--muted);padding:6px 14px;font-size:13px;font-weight:700;border-radius:6px 6px 0 0;white-space:nowrap;position:relative;top:2px}
-.stab.on{background:var(--sheet);color:var(--title-t);border-top:3px solid var(--g1h-t);border-bottom:2px solid var(--sheet)}
-.stab small{font-weight:500;color:var(--muted2);margin-left:4px}
+.btn.small{padding:5px 12px;font-size:14px}
+.icon-btn{border:0;background:transparent;width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;color:var(--accent);font-size:16px}
+.icon-btn:active{background:var(--fill)}
+.notice{background:var(--bad-tint);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--ink)}
+.notice b{color:var(--bad)}
+.notice.warn{background:var(--warn-tint)}
+.notice.warn b{color:var(--warn)}
+.empty{color:var(--muted);text-align:center;padding:28px 12px;font-size:15px}
 
-/* 엑셀 표 */
-.xl-wrap{overflow-x:auto;background:var(--sheet);border:1px solid #BFB6A8;-webkit-overflow-scrolling:touch}
-table.xl{border-collapse:separate;border-spacing:0;font-size:12.5px;width:100%}
-table.xl th,table.xl td{border-right:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:5px 6px;text-align:center;vertical-align:middle;white-space:nowrap}
-table.xl thead th{font-weight:700;position:sticky;top:0;z-index:2}
-table.xl thead tr:nth-child(2) th{top:31px}
-table.xl th.dh{background:var(--dayh-f);color:var(--dayh-t)}
-table.xl th.g1h{background:var(--g1h-f);color:var(--g1h-t);font-size:14px;height:31px}
-table.xl th.g2h{background:var(--g2h-f);color:var(--g2h-t);font-size:14px}
-table.xl th.c1{background:var(--c1-f);color:var(--c1-t)} table.xl th.c2{background:var(--c2-f);color:var(--c2-t)}
-table.xl th.a1h{background:var(--a1h-f);color:var(--c1-t)} table.xl th.a2h{background:var(--a2h-f);color:var(--c2-t)}
-table.xl th.th{background:var(--th-f);color:var(--th-t);border-bottom:1px solid var(--th-b)}
-table.xl .sticky0{position:sticky;left:0;z-index:1}
-table.xl .sticky1{position:sticky;left:40px;z-index:1;border-right:1px solid #BFB6A8}
-table.xl thead .sticky0,table.xl thead .sticky1{z-index:3}
-table.plan{min-width:1360px}
-table.plan td.day{background:var(--day-f);width:40px;min-width:40px;font-variant-numeric:tabular-nums}
-table.plan td.date{background:var(--day-f);width:64px;min-width:64px;font-variant-numeric:tabular-nums;font-weight:600}
-table.plan td.date small{display:block;font-size:10px;color:var(--muted);font-weight:500}
-table.plan tr.sun td.date small{color:var(--bad)}
-table.plan tr.today td.day,table.plan tr.today td.date{background:var(--blue-f);color:var(--blue);font-weight:800}
-table.plan tr.sun td{border-bottom:1px solid #BFB6A8}
-table.plan tr{cursor:pointer}
-table.plan tr:hover td{filter:brightness(.98)}
-td.m1{background:var(--m1-f)} td.m2{background:var(--m2-f)}
-td.new{background:var(--new-f)} td.al1{background:var(--a1-f)} td.al2{background:var(--a2-f)}
-td.gg1{background:var(--gg1-f);color:var(--gg1-t);font-weight:800} td.gg2{background:var(--gg2-f);color:var(--gg2-t);font-weight:800}
-td.b1{border-left:1px solid #BFB6A8} td.b2{border-left:2px solid #CDB8B2}
-td.done{background:var(--good-f) !important}
-td.off{background:#EFEFEF !important;color:#BDBDBD !important}
-td.off .first{color:#BDBDBD}
-.dash{color:#C9C1B6}
-.short{color:var(--bad);font-weight:800}
-.short::after{content:" 부족";font-size:10px}
-.first{color:var(--first-t);font-weight:800}
-.al small{font-size:10px;color:var(--muted);margin-left:1px}
-td.ck{background:#EEF6FF;width:48px;min-width:48px}
-.ckb{width:26px;height:26px;border:1.5px solid #9DB3D9;border-radius:5px;background:#fff;color:#fff;font-weight:800;font-size:14px;line-height:1;padding:0}
-.ckb.on{background:var(--good);border-color:var(--good)}
-td.memo{text-align:left;color:var(--muted);font-size:11.5px;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+/* segmented control */
+.seg{display:inline-flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:7px;padding:5px 14px;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;min-width:52px}
+.seg button.on{background:var(--thumb);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chipbtn{border:0;background:var(--card);border-radius:99px;padding:6px 14px;font-size:15px;white-space:nowrap;color:var(--ink)}
+.chipbtn.on{background:var(--accent);color:#fff;font-weight:600}
 
-/* 알레르기 노출 기록 */
-table.alg{min-width:760px}
-table.alg td.an{background:var(--th-f);color:var(--th-t);font-weight:800;position:sticky;left:0;z-index:1}
-table.alg td.tot{font-weight:800;color:var(--th-t)}
-td.ate{background:var(--good-f);color:var(--good);font-weight:700}
-td.tod{background:var(--blue-f);color:var(--blue);font-weight:800}
+/* grouped lists / tables */
+.gridwrap{overflow-x:auto;background:var(--card);border-radius:10px}
+.bar{height:4px;border-radius:2px;background:var(--fill);overflow:hidden;margin-top:4px}
+.bar span{display:block;height:100%;background:var(--accent);border-radius:2px}
+.batch-date{font-size:17px;font-weight:600}
+h2.sec{font-size:13px;font-weight:400;color:var(--muted);text-transform:uppercase;margin:10px 16px -8px}
+table.pt,table.ct,table.tbl{border-collapse:separate;border-spacing:0;width:100%;font-size:15px}
+table.pt{min-width:580px}
+table th{position:sticky;top:0;background:var(--card);font-size:12px;color:var(--muted);font-weight:500;padding:10px 8px 6px;border-bottom:.5px solid var(--line);text-align:left;white-space:nowrap;z-index:1}
+table td{border-bottom:.5px solid var(--line);padding:10px 8px;vertical-align:middle}
+table tr:last-child td{border-bottom:0}
+table.pt td{vertical-align:top;line-height:1.35;font-size:14px}
+table.pt td.d{position:sticky;left:0;background:var(--card);white-space:nowrap;width:64px;z-index:1;cursor:pointer;padding-left:14px}
+table.pt tr.mrow{cursor:pointer}
+table.pt tr.mrow:active td{background:var(--fill)}
+.d .dn{font-size:17px;font-weight:600;display:block;font-variant-numeric:tabular-nums}
+.d .dw{font-size:12px;color:var(--muted)}
+.d .dd{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+tr.sun .d .dw{color:var(--bad)}
+tr.today .d .dn{color:#fff;background:var(--accent);border-radius:8px;padding:1px 6px;display:inline-block}
+tr.past td:not(.d){color:var(--muted)}
+tr.done td:not(.d){background:var(--good-tint)}
+td.k{font-size:12px;color:var(--muted);white-space:nowrap;width:36px}
+td.g{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.ln{display:block;white-space:nowrap}
+.ln.short{color:var(--bad);font-weight:600}
+.ln.short::after{content:" 부족";font-size:11px}
+.etc{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+td.ckc{width:48px;text-align:center}
+.ck{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--muted2);background:transparent;padding:0;color:#fff;font-size:14px;font-weight:700;line-height:1;display:inline-grid;place-items:center}
+.ck.on{background:var(--good-solid);border-color:var(--good-solid)}
+tr.blank td{color:var(--muted)}
+.r{text-align:right;font-variant-numeric:tabular-nums}
+table.ct tr.grp td{background:var(--bg);padding:16px 16px 6px;border-bottom:0}
+table.ct tr.grp:first-child td{padding-top:10px}
+table.ct td:first-child,table.tbl td:first-child,table th:first-child{padding-left:16px}
+table.ct td:last-child,table.tbl td:last-child,table th:last-child{padding-right:14px}
+table.ct tr.gone td{color:var(--muted)}
+table.ct tr.gone .nmb{text-decoration:line-through;color:var(--muted)}
+.nmb{border:0;background:transparent;padding:0;text-align:left;font-size:17px;font-weight:400;color:var(--ink)}
+.nmb small,.nm small{font-size:12px;color:var(--muted);font-weight:400;margin-left:3px}
+.nm{font-size:16px;white-space:nowrap}
+.inote2{display:block;font-size:12px;color:var(--muted)}
+.dchips{display:flex;flex-wrap:wrap;gap:4px}
+.dchip{font-size:11px;padding:1px 6px;border-radius:6px;background:var(--fill);color:var(--muted);font-variant-numeric:tabular-nums}
+.dchip.ate{background:var(--good-tint);color:var(--good)}
+.dchip.first{font-weight:700}
 
-/* 장보기 */
-table.shop{min-width:0}
-table.shop th.cat{background:var(--cat-f);color:#3F3733;width:84px;font-size:12px}
-table.shop td{text-align:left;white-space:normal}
-.shopbtn{border:0;background:transparent;padding:4px 8px;margin:1px 2px;border-radius:4px;font-size:13px;color:#3F3733}
-.shopbtn.on{color:var(--good);font-weight:700;background:var(--good-f)}
-.shopbtn.need::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--bad);margin-left:3px;vertical-align:top}
+/* iOS stepper */
+.stepper{display:inline-flex;align-items:center;background:var(--fill);border-radius:8px;overflow:hidden}
+.stepper button{width:44px;height:32px;border:0;background:transparent;font-size:22px;font-weight:400;line-height:1;color:var(--ink);display:grid;place-items:center;padding:0}
+.stepper button + button{border-left:.5px solid var(--line)}
+.stepper button:active{background:var(--fill)}
+.stepper button:disabled{color:var(--muted2);cursor:default}
 
-/* 큐브 재고 */
-table.cube{min-width:900px}
-table.cube th{background:var(--shop-f);color:#3F3733}
-table.cube td{background:var(--row-f)}
-table.cube td.nm{font-weight:800;color:#2F3A8F;text-decoration:underline dotted 1px;text-underline-offset:3px;cursor:pointer}
-table.cube tr.gone td:not(.md){color:var(--muted2);text-decoration:line-through}
-table.cube tr.gone td.nm{color:var(--muted2)}
-table.cube td.circles{text-align:left;white-space:normal;min-width:420px}
-.cc{display:inline-block;vertical-align:middle;width:19px;height:19px;margin:2px;padding:0;border:1.6px solid #6B625A;border-radius:50%;background:#fff}
-.cc.sq{border-radius:3px}
-.cc.used{border-color:#C9C1B6;background:linear-gradient(135deg,transparent 45%,#C9C1B6 45%,#C9C1B6 56%,transparent 56%)}
-.cc:nth-child(5n){margin-right:8px}
+/* 칸 view */
+.item{padding:12px 0;border-top:.5px solid var(--line)}
+.batch-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px}
+.batch-head + .item{border-top:0}
+.item-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.iname{font-size:17px}
+.iname sup{font-size:11px;color:var(--muted);margin-left:2px}
+.iname.gone{text-decoration:line-through;color:var(--muted)}
+.count{font-variant-numeric:tabular-nums;font-size:15px;color:var(--muted)}
+.count b{color:var(--ink);font-weight:600}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dot{position:relative;width:30px;height:30px;border:1.5px solid var(--accent);border-radius:50%;background:var(--accent-soft);padding:0}
+.dot.sq{border-radius:7px}
+.dot.used{border-color:var(--muted2);background:transparent}
+.dot.used::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:26px;background:var(--muted);transform:translate(-50%,-50%) rotate(40deg);border-radius:2px}
+.dot:nth-child(5n){margin-right:8px}
+.inote{font-size:13px;color:var(--muted)}
 
-/* 필요수량 / 기록 표 */
-table.need{min-width:640px} table.rec{min-width:640px}
-table.need td.grp{background:var(--th-f);color:var(--th-t);font-weight:800}
-table.need td.k,table.rec td.k{font-weight:700}
-td.rem{color:var(--gg1-t);font-weight:800} td.req{color:var(--gg2-t);font-weight:800} td.lack{color:var(--bad);font-weight:800} td.zero{color:#C9C1B6}
-.chk{font-size:15px}
+/* tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--bar-bg);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--line);padding:4px 8px calc(4px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:5}
+nav.tabs .in{max-width:760px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
+.tab{border:0;background:transparent;padding:4px 2px 2px;color:#8e8e93;font-size:10px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:2px;letter-spacing:.1px}
+.tab svg{width:26px;height:26px}
+.tab.on{color:var(--accent)}
 
-/* 시트 탭 (하단) */
-nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#EDE8DF;border-top:1px solid #C9C1B6;padding:0 8px calc(2px + env(safe-area-inset-bottom));z-index:5}
-nav.tabs .in{max-width:1400px;margin:0 auto;display:flex;gap:2px;overflow-x:auto}
-.tab{border:1px solid #C9C1B6;border-top:0;background:#F4F0E9;color:var(--muted);padding:9px 14px 10px;font-size:13px;font-weight:700;border-radius:0 0 7px 7px;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.tab::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--tc,#ccc)}
-.tab[data-tab="plan"]{--tc:#A9C7AF} .tab[data-tab="cube"]{--tc:#EDB79E} .tab[data-tab="stock"]{--tc:#E8CF6E} .tab[data-tab="allergy"]{--tc:#C9AED6}
-.tab.on{background:var(--sheet);color:var(--title-t);border-bottom:3px solid var(--tc);margin-top:-1px}
-.tab svg{display:none}
-
-/* 편집 시트(모달) */
-.scrim{position:fixed;inset:0;background:rgba(40,34,28,.4);display:none;align-items:flex-end;justify-content:center;z-index:10}
+/* modal sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:10}
 .scrim.open{display:flex}
-.sheet{background:var(--paper);width:100%;max-width:640px;max-height:94%;overflow:auto;border-radius:10px 10px 0 0;padding:0 14px calc(22px + env(safe-area-inset-bottom));border:2px solid #7D8B80;border-bottom:0}
+.sheet{background:var(--bg);width:100%;max-width:620px;max-height:94%;overflow:auto;border-radius:12px 12px 0 0;padding:0 16px calc(24px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
 .grabber{width:36px;height:5px;border-radius:3px;background:var(--muted2);margin:6px auto 0}
-.sheethead{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:48px;margin:0 -14px 8px;padding:0 8px;background:var(--title-f);border-bottom:1px solid var(--line)}
-.sheethead b{font-size:16px;color:var(--title-t);text-align:center}
-.tbtn{border:0;background:transparent;color:var(--title-t);font-size:15px;padding:8px;justify-self:start}
-.tbtn.strong{font-weight:800;justify-self:end}
-.sheetsub{text-align:center;margin:-2px 0 10px}
-.group{background:var(--sheet);border:1px solid var(--line);overflow:hidden}
-.grouphead{font-size:12px;color:var(--muted);margin:0 2px 4px;font-weight:700}
-.field{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;padding:4px 12px;border-bottom:1px solid var(--hair)}
+.sheethead{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:52px;margin:0 -16px 6px;padding:0 8px;background:var(--bg)}
+.sheethead b{font-size:17px;font-weight:600;text-align:center}
+.tbtn{border:0;background:transparent;color:var(--accent);font-size:17px;padding:8px;justify-self:start}
+.tbtn.strong{font-weight:600;justify-self:end}
+.sheetsub{text-align:center;margin:-6px 0 14px}
+.group{background:var(--card);border-radius:10px;overflow:hidden}
+.grouphead{font-size:13px;color:var(--muted);margin:0 16px 6px;text-transform:uppercase}
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:6px 16px;border-bottom:.5px solid var(--line);min-width:0}
 .field:last-child{border-bottom:0}
-.field label{font-size:14px;font-weight:600;color:var(--lab-t);white-space:nowrap}
-.field input,.field select{border:0;background:transparent;color:var(--ink);text-align:right;text-align-last:right;font-size:15px;padding:4px 0;min-width:0;flex:1 1 auto;width:100%;-webkit-appearance:none;appearance:none}
-.field select{padding-right:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2352655A' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right center}
+.field label{font-size:17px;color:var(--ink);white-space:nowrap;flex:none}
+.field input,.field select{border:0;background:transparent;color:var(--muted);text-align:right;text-align-last:right;font-size:17px;padding:4px 0;min-width:0;flex:1 1 auto;width:100%;-webkit-appearance:none;appearance:none}
+.field input::placeholder{color:var(--muted2)}
+.field select{padding-right:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='13' viewBox='0 0 8 13'%3E%3Cpath d='M1.5 1.5l5 5-5 5' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center}
 .field input[type=date]{max-width:60%}
-.field.stage input:first-child{text-align:left}
+.field.stage input:first-child{text-align:left;color:var(--ink)}
 .sheet .grid2,.sheet .grid3{display:block}
-.mealbox{background:var(--sheet);border:1px solid var(--line);overflow:hidden}
-.mealbox h3{margin:0;padding:9px 12px;font-size:15px;font-weight:800;display:flex;justify-content:space-between;align-items:center;background:var(--g1h-f);color:var(--g1h-t)}
-.mealbox + .mealbox h3{background:var(--g2h-f);color:var(--g2h-t)}
-.calc{font-size:12px;color:var(--gg1-t);padding:8px 12px;background:var(--gg1-f)}
-.rowbtn{display:block;width:100%;border:0;border-top:1px solid var(--hair);background:var(--sheet);color:var(--title-t);font-size:15px;font-weight:600;text-align:center;padding:11px 12px}
+.mealbox{background:var(--card);border-radius:10px;overflow:hidden}
+.mealbox h3{margin:0;padding:12px 16px;font-size:17px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:.5px solid var(--line)}
+.calc{font-size:13px;color:var(--muted);padding:10px 16px;background:var(--card)}
+.rowbtn{display:block;width:100%;border:0;background:var(--card);color:var(--accent);font-size:17px;text-align:center;padding:12px 16px;border-radius:10px}
 .rowbtn.danger{color:var(--bad)}
-.group .rowbtn{text-align:left}
-.toast{position:fixed;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translate(-50%,-8px);background:#3F3A36;color:#FBF8F2;padding:9px 14px;border-radius:8px;font-size:14px;max-width:min(92vw,520px);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.group .rowbtn{border-radius:0;text-align:left}
+.toast{position:fixed;left:50%;top:calc(54px + env(safe-area-inset-top));transform:translate(-50%,-8px);background:var(--bar-bg);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);color:var(--ink);padding:10px 16px;border-radius:14px;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.18);max-width:min(92vw,520px);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-@media (prefers-reduced-motion: reduce){.toast,.navtitle{transition:none}}
-@media (max-width:520px){ .tab{padding:8px 8px 9px;font-size:12px;gap:4px} .tab::before{width:8px;height:8px} .titleband h1{font-size:18px} .icell{flex:1 1 50%} .icell .iv{flex:1} }
+@media (prefers-reduced-motion: reduce){ .toast,.navbar,.navtitle{transition:none} .sheet{animation:none} }
+main.stack > .sub{margin:-6px 16px 0}
+@media (max-width:420px){ .dot{width:27px;height:27px} }
 </style>
 </head>
 <body>
 <div class="navbar" id="navbar">
-  <button class="navbtn" id="settingsBtn">⚙ 설정</button>
+  <button class="navbtn" id="settingsBtn">설정</button>
   <span class="navtitle" id="navTitle">우리 아기 이유식</span>
-  <button class="navbtn plus" id="fab" aria-label="추가">＋ 추가</button>
+  <button class="navbtn plus" id="fab" aria-label="추가"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
 </div>
 <div class="wrap">
-  <header class="xhead">
-    <div class="titleband"><h1 id="appTitle">🥣 우리 아기 이유식</h1></div>
-    <div class="inforow" id="infoRow"></div>
-    <div class="noteband" id="noteBand">※ 기본 1끼 = 곡류 + 단백질 + 채소 15g씩 · 과일은 아기에 맞게<span class="sync" id="sync">불러오는 중</span></div>
+  <header class="large">
+    <h1 id="appTitle">우리 아기 이유식</h1>
+    <div class="hmeta"><span class="sub" id="todayLabel"></span><span class="sync" id="sync">불러오는 중</span></div>
   </header>
-  <span id="todayLabel" hidden></span>
   <main id="view" class="stack"></main>
 </div>
 
-<nav class="tabs" aria-label="시트">
+<nav class="tabs" aria-label="화면 전환">
   <div class="in">
-    <button class="tab" data-tab="plan">식단표</button>
-    <button class="tab" data-tab="cube">큐브 현황표</button>
-    <button class="tab" data-tab="stock">필요수량</button>
-    <button class="tab" data-tab="allergy">알레르기 기록</button>
+    <button class="tab" data-tab="plan"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="19" height="17" rx="3.5"/><path d="M3.5 10h19M8.5 3v4M17.5 3v4" stroke-linecap="round"/><path d="M8 14.5h2M12 14.5h2M16 14.5h2M8 18h2M12 18h2" stroke-linecap="round" stroke-width="2"/></svg><span>식단표</span></button>
+    <button class="tab" data-tab="cube"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="4.5" width="19" height="17" rx="3.5"/><path d="M10 4.5v17M16 4.5v17M3.5 13h19"/></svg><span>큐브 현황</span></button>
+    <button class="tab" data-tab="stock"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 21.5h18"/><rect x="5.5" y="12" width="3.5" height="7" rx="1"/><rect x="11.25" y="7" width="3.5" height="12" rx="1"/><rect x="17" y="3.5" width="3.5" height="15.5" rx="1"/></svg><span>필요수량</span></button>
+    <button class="tab" data-tab="allergy"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 3l8 3v6.5c0 5-3.4 8.6-8 10.5-4.6-1.9-8-5.5-8-10.5V6z"/><path d="M13 8.5v5.5" stroke-linecap="round" stroke-width="2.2"/><circle cx="13" cy="17.5" r="1.2" fill="currentColor" stroke="none"/></svg><span>알레르기</span></button>
   </div>
 </nav>
 
@@ -455,23 +462,7 @@ function setDefaultN(n){
   render();
 }
 
-/* ---------- render (엑셀 플래너 디자인) ---------- */
-function dot(s){return s?s.replace(/-/g,"."):""}
-function monthsOld(b,ds){if(!b)return null;const x=parse(b),y=parse(ds);let m=(y.getFullYear()-x.getFullYear())*12+(y.getMonth()-x.getMonth());if(y.getDate()<x.getDate())m--;return m}
-function dayNum(ds){const l=dayLabel(ds);return l?l.split(" D")[1]:""}
-function catOf(n){n=norm(n);return GRAINS.includes(n)?"곡류":PROTEINS.includes(n)?"단백질":FRUITS.includes(n)?"과일":"채소"}
-const CATS=["곡류","단백질","채소","과일"];
-function infoRow(){
-  const t=D.t,s=S(),n=s.defaultN||1,sts=stagesSorted();
-  const mo=monthsOld(s.birth,t);
-  const cell=(l,v,cls)=>'<div class="icell"><span class="il">'+l+'</span><span class="iv'+(cls?" "+cls:"")+'">'+v+'</span></div>';
-  return cell("아기<br>생년월일",s.birth?dot(s.birth):'<span class="sub">설정에서 입력</span>')+
-    cell("이유식<br>시작일",sts.length?dot(sts[0].start):"–")+
-    cell("오늘",md(t),"misc")+
-    cell("월령",s.birth?(mo+"개월 · "+(diffDays(s.birth,t)+1)+"일"):"–","misc")+
-    cell("단계",esc(dayLabel(t)||"–"),"misc")+
-    '<div class="icell"><span class="il">하루<br>이유식</span><span class="iv"><span class="seg" role="group" aria-label="하루 끼니 수">'+[1,2].map(k=>'<button data-act="setn" data-n="'+k+'" class="'+(n===k?"on":"")+'" aria-pressed="'+(n===k)+'">'+k+'끼</button>').join("")+'</span></span></div>';
-}
+/* ---------- render ---------- */
 function render(){
   derive();
   const t=D.t;
@@ -479,8 +470,8 @@ function render(){
   const bn=S().babyName;let title="우리 아기 이유식";
   if(bn){const c=bn.charCodeAt(bn.length-1);title=bn+(c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28?"이":"")+" 이유식"}
   document.getElementById("fab").style.visibility="";document.getElementById("settingsBtn").style.visibility="";
-  document.getElementById("appTitle").textContent="🥣 "+title+" 플래너";document.getElementById("navTitle").textContent=title;document.title=title;
-  document.getElementById("infoRow").innerHTML=infoRow();
+  document.getElementById("appTitle").textContent=title;document.getElementById("navTitle").textContent=title;document.title=title;
+  document.getElementById("todayLabel").textContent=["오늘 "+md(t),ageLabel(t),dayLabel(t)].filter(Boolean).join(" · ");
   const s=document.getElementById("sync");
   if(state.mode==="db"){s.textContent=state.offline?"오프라인 · 연결되면 저장":"가족과 공유 중";s.className="sync"+(state.offline?" local":"")}
   else if(state.mode==="local"){s.textContent="이 기기에만 저장";s.className="sync local"}
@@ -505,115 +496,113 @@ function rangeDates(){
   return [first<t?first:t,last>t?last:t];
 }
 
-function cellTxt(s,date,i){
-  if(isBlank(s))return '<span class="dash">–</span>';
-  let short=false;itemNeeds(s,D.idx).forEach((n,k)=>{if(D.shortCells.has(date+"#"+i+"#"+k))short=true});
-  return '<span'+(short?' class="short"':'')+'>'+esc(s)+'</span>';
-}
-const MEAL_COLS=["곡류 ▼","단백질 ▼","채소① ▼","채소② ▼","채소③ ▼","과일 ▼","새 재료","알레르기 ▼","기본량 g","먹음"];
-function mealCells(p,ds,i,on){
-  const k=i+1,b=i?"b2":"b1";
-  if(!on){return MEAL_COLS.map((_,j)=>'<td class="m'+k+' off'+(j===0?" "+b:"")+'">'+(j===MEAL_COLS.length-1?"":'<span class="dash">–</span>')+'</td>').join("")}
-  const m=mealsOf(p)[i];const v=m.veg||[];
-  const al=allergensOf(m).map(a=>{const ai=D.aIdx.get(ds+"#"+i+"#"+a);return '<span class="al'+(ai===1?" first":"")+'">'+esc(a)+'<small>'+(ai===1?"첫":ai+"회")+'</small></span>'}).join(" ");
-  const g=mealGrams(m);
-  return '<td class="m'+k+' '+b+'">'+cellTxt(m.grain,ds,i)+'</td><td class="m'+k+'">'+cellTxt(m.protein,ds,i)+'</td>'+
-    [0,1,2].map(j=>'<td class="m'+k+'">'+cellTxt(v[j],ds,i)+'</td>').join("")+
-    '<td class="m'+k+'">'+(isBlank(m.fruit)?'<span class="dash">–</span>':esc(m.fruit))+'</td>'+
-    '<td class="'+(isBlank(m.newFood)?"m"+k:"new")+'">'+(isBlank(m.newFood)?'<span class="dash">–</span>':'<b>'+esc(m.newFood)+'</b>')+'</td>'+
-    '<td class="al'+k+'">'+(al||'<span class="dash">–</span>')+'</td>'+
-    '<td class="gg'+k+'">'+(g||"")+(m.ate?'<br><small class="sub">먹은 '+esc(m.ate)+'</small>':'')+'</td>'+
-    '<td class="ck'+(m.done?" done":"")+'"><button class="ckb'+(m.done?" on":"")+'" data-act="done" data-d="'+ds+'" data-i="'+i+'" aria-pressed="'+(m.done?"true":"false")+'" aria-label="'+md(ds)+' '+k+'끼 먹음">'+(m.done?"✓":"")+'</button></td>';
-}
-function viewPlan(){
-  const t=D.t;
-  const [a,b]=rangeDates();
-  const sts=stagesSorted();
-  const lastDay=D.days.length?D.days[D.days.length-1].date:null;
-  let html='<div class="stabs" role="tablist">'+sts.map((s,i)=>{const nx=sts[i+1];const end=nx?addDays(nx.start,-1):(lastDay&&lastDay>=s.start?lastDay:null);return '<button class="stab'+(state.range==="stage:"+s.name?" on":"")+'" data-act="range" data-r="stage:'+esc(s.name)+'">'+esc(s.name)+'<small>DAY '+dayNum(s.start)+(end?'~'+dayNum(end):'~')+'</small></button>'}).join("")+
-    '<button class="stab'+(state.range==="week"?" on":"")+'" data-act="range" data-r="week">이번 주</button><button class="stab'+(state.range==="all"?" on":"")+'" data-act="range" data-r="all">전체</button></div>';
-  const shortSoon=[...D.firstShort.entries()].filter(([,x])=>x.date<=addDays(t,6));
-  if(shortSoon.length)html+='<div class="notice"><b>일주일 안에 큐브가 모자라요.</b> '+shortSoon.map(([k,x])=>esc(labelKey(k))+' ('+mdShort(x.date)+' '+(x.i+1)+'끼부터)').join(", ")+'</div>';
-  if(!state.plan.size)return html+'<div class="card empty">아직 식단이 없어요. 위 ＋ 추가 버튼으로 날짜별 식단을 넣으세요.</div>';
-  const n=S().defaultN||1;
-  html+='<div class="xl-wrap"><table class="xl plan"><thead><tr><th class="dh sticky0" rowspan="2">DAY</th><th class="dh sticky1" rowspan="2">날짜</th>'+
-    '<th class="g1h" colspan="'+MEAL_COLS.length+'">1끼</th><th class="g2h" colspan="'+MEAL_COLS.length+'">2끼'+(n===1?' <small style="font-weight:500">(하루 2끼일 때)</small>':'')+'</th><th class="dh" rowspan="2">메모</th></tr><tr>'+
-    MEAL_COLS.map((c,j)=>'<th class="'+(j===7?"a1h":"c1")+'">'+c+'</th>').join("")+MEAL_COLS.map((c,j)=>'<th class="'+(j===7?"a2h":"c2")+'">'+c+'</th>').join("")+'</tr></thead><tbody>';
-  for(let ds=a;ds<=b;ds=addDays(ds,1)){
-    const p=state.plan.get(ds),dd=parse(ds);
-    const rc=(ds===t?" today":"")+(dd.getDay()===0?" sun":"");
-    const dcell='<td class="day sticky0">'+dayNum(ds)+'</td><td class="date sticky1">'+mdShort(ds)+'<small>'+WD[dd.getDay()]+'</small></td>';
-    if(!p){html+='<tr id="row-'+ds+'" class="'+rc+'" data-act="day" data-d="'+ds+'">'+dcell+'<td colspan="'+(MEAL_COLS.length*2+1)+'" class="sub" style="text-align:left;padding-left:14px">식단 없음 · 눌러서 추가</td></tr>';continue}
-    const pn=p.n||1;const memo=mealsOf(p).map(m=>m.memo).filter(Boolean).join(" / ");
-    html+='<tr id="row-'+ds+'" class="'+rc+'" data-act="day" data-d="'+ds+'">'+dcell+mealCells(p,ds,0,true)+mealCells(p,ds,1,pn>=2)+'<td class="memo">'+esc(memo)+'</td></tr>';
-  }
-  html+='</tbody></table></div><span class="sub">행을 누르면 그날 식단을 고칠 수 있어요. 먹음을 체크하면 들어간 큐브가 재고에서 빠져요. 빨간 글씨는 그 끼니 때 큐브가 모자란다는 뜻이고, 노란 칸은 새 재료예요.</span>';
-  html+=allergyTable(a,b,"🥄 알레르기 노출 기록 · 날짜 & 횟수");
-  return html;
-}
-function allergyTable(a,b,title){
-  const t=D.t;
-  let list=[...D.aStats.keys()];
-  if(a)list=list.filter(x=>D.aStats.get(x).some(e=>e.date>=a&&e.date<=b));
-  const order=x=>{const i=ALLERGENS.indexOf(x);return i<0?99:i};
-  list.sort((x,y)=>order(x)-order(y)||x.localeCompare(y));
-  let h='<div class="panel"><div class="band sec">'+title+'</div>';
-  if(!list.length)return h+'<div class="empty">'+(a?"이 기간에는 알레르기 식품이 없어요.":"아직 기록된 알레르기 식품이 없어요.")+'</div></div>';
-  const max=Math.max(10,...list.map(x=>D.aStats.get(x).length));
-  h+='<div class="xl-wrap" style="border:0"><table class="xl alg"><thead><tr><th class="th">알레르기 식품</th>'+Array.from({length:max},(_,i)=>'<th class="th">'+(i+1)+'회</th>').join("")+'<th class="th">먹음</th></tr></thead><tbody>';
-  list.forEach(x=>{const xs=D.aStats.get(x);
-    h+='<tr><td class="an">'+esc(x)+'</td>'+Array.from({length:max},(_,i)=>{const e=xs[i];if(!e)return '<td></td>';const inR=!a||(e.date>=a&&e.date<=b);return '<td class="'+(e.date===t?"tod":e.ate?"ate":"")+'"'+(inR?"":' style="opacity:.45"')+'>'+mdShort(e.date)+(e.i?'<small class="sub">·2끼</small>':'')+'</td>'}).join("")+'<td class="tot">'+xs.filter(e=>e.ate).length+'</td></tr>'});
-  return h+'</tbody></table></div></div>';
+function cellLines(strs,date,i,cls){
+  return strs.filter(x=>!isBlank(x)).map(s=>{
+    let short=false;itemNeeds(s,D.idx).forEach((n,k)=>{if(D.shortCells.has(date+"#"+i+"#"+k))short=true});
+    return '<span class="ln'+(short?" short":"")+'">'+esc(s)+'</span>';
+  }).join("")||'<span class="sub">–</span>';
 }
 
-function viewCube(){
-  const t=D.t,s=S();const shop=new Set(s.shop||[]);
-  let totalLeft=0;state.cubes.forEach(c=>totalLeft+=left(c));
-  let html='<div class="panel"><div class="band peach">큐브 현황표</div>';
-  // 장보기 리스트
-  const lack=new Set();D.firstShort.forEach((x,k)=>{if(x.date<=addDays(t,13))lack.add(k.split("|")[0])});
-  const inPlan=new Set();D.all.forEach(x=>{if(x.date>=t){mealParts(x.m).forEach(p=>inPlan.add(p.name));if(!isBlank(x.m.fruit))inPlan.add(norm(x.m.fruit))}});
-  const pool={곡류:GRAINS,단백질:PROTEINS,채소:VEGS,과일:FRUITS};
-  html+='<div class="band shop">🛒 장보기 리스트 <small class="sub" style="font-weight:500">· 체크는 가족과 같이 보여요 · 빨간 점은 2주 안에 큐브가 모자란 재료</small></div><div class="xl-wrap" style="border-left:0;border-right:0"><table class="xl shop"><tbody>';
-  CATS.forEach(c=>{
-    const items=[...new Set(pool[c].concat([...inPlan].filter(n=>catOf(n)===c)))];
-    html+='<tr><th class="cat">'+c+'</th><td>'+items.map(n=>'<button class="shopbtn'+(shop.has(n)?" on":"")+(lack.has(n)?" need":"")+(inPlan.has(n)?"":" ")+'" data-act="shop" data-v="'+esc(n)+'" aria-pressed="'+shop.has(n)+'"'+(inPlan.has(n)||shop.has(n)?"":' style="opacity:.55"')+'>'+(shop.has(n)?"☑":"□")+' '+esc(n)+'</button>').join("")+'</td></tr>';
-  });
-  html+='</tbody></table></div>'+(shop.size?'<div style="padding:6px 10px;text-align:right"><button class="btn small" data-act="shopclear">체크 모두 지우기</button></div>':'');
-  // 큐브 재고
-  html+='<div class="band stock">🧊 큐브 재고 <small class="sub" style="font-weight:500">· 남은 큐브 '+totalLeft+'개 · ○ 누르면 1개 사용, ⊘ 누르면 되돌리기</small></div>';
-  if(!state.cubes.size)return html+'<div class="empty">아직 등록된 큐브가 없어요. 위 ＋ 추가 버튼으로 만든 큐브를 넣으세요.</div></div>';
-  const byDate=new Map();state.cubes.forEach(c=>{if(!byDate.has(c.made))byDate.set(c.made,[]);byDate.get(c.made).push(c)});
-  const dates=[...byDate.keys()].sort();let goneN=0,body="";
-  dates.forEach(ds=>{
-    const items=byDate.get(ds).sort((a,b)=>(a.order||0)-(b.order||0)||a.name.localeCompare(b.name));
-    const anyLeft=items.some(c=>left(c)>0);if(!anyLeft){goneN++;if(!state.showGone)return}
-    const age=diffDays(ds,t);
-    items.forEach((c,j)=>{
-      const l=left(c),u=c.used||0;
-      const st=l===0?'<span class="pill muted">다 씀</span>':age>=OLD_DAYS?'<span class="pill warn">먼저 쓰기</span>':l<=LOW_LEFT?'<span class="pill warn">곧 소진</span>':'<span class="pill good">있음</span>';
-      let circ="";for(let i=0;i<c.total;i++)circ+='<button class="cc'+(c.shape==="square"?" sq":"")+(i<u?" used":"")+'" data-act="dot" data-id="'+c.id+'" data-i="'+i+'" aria-label="'+esc(c.name)+' '+(i+1)+'번째 '+(i<u?"되돌리기":"사용")+'"></button>';
-      body+='<tr class="'+(l===0?"gone":"")+'">'+(j===0?'<td class="md" rowspan="'+items.length+'"><b>'+mdShort(ds)+'</b><br><small class="sub">'+WD[parse(ds).getDay()]+' · '+age+'일째</small></td>':'')+
-        '<td class="nm" data-act="editcube" data-id="'+c.id+'">'+esc(c.name)+'</td><td>'+(c.size?c.size+"g":'<span class="dash">–</span>')+'</td><td>'+c.total+'</td>'+
-        '<td class="circles">'+circ+'</td><td><b style="font-size:15px">'+l+'</b></td><td>'+st+'</td><td class="memo">'+esc(c.note||"")+'</td></tr>';
+function viewPlan(){
+  const t=D.t;const n=S().defaultN||1;
+  const [a,b]=rangeDates();
+  const sts=stagesSorted();
+  let html='<div class="row between"><div class="row"><span class="sub">하루 이유식</span><div class="seg" role="group" aria-label="하루 끼니 수">'+
+    [1,2].map(k=>'<button data-act="setn" data-n="'+k+'" class="'+(n===k?"on":"")+'" aria-pressed="'+(n===k)+'">'+k+'끼</button>').join("")+'</div></div>'+
+    '<span class="sub">오늘부터 바뀌어요 · 날짜별로도 바꿀 수 있어요</span></div>';
+  html+='<div class="chips">'+sts.map((s,i)=>{const nx=sts[i+1];const lastDay=D.days.length?D.days[D.days.length-1].date:null;const end=nx?addDays(nx.start,-1):(lastDay&&lastDay>=s.start?lastDay:null);const a=dayLabel(s.start).split(" D")[1];const z=end?dayLabel(end).split(" D")[1]:null;return '<button class="chipbtn'+(state.range==="stage:"+s.name?" on":"")+'" data-act="range" data-r="stage:'+esc(s.name)+'">'+esc(s.name)+' D'+a+(z?'~'+z:'~')+'</button>'}).join("")+
+    '<button class="chipbtn'+(state.range==="week"?" on":"")+'" data-act="range" data-r="week">이번 주</button><button class="chipbtn'+(state.range==="all"?" on":"")+'" data-act="range" data-r="all">전체</button></div>';
+  const shortSoon=[...D.firstShort.entries()].filter(([,x])=>x.date<=addDays(t,6));
+  if(shortSoon.length)html+='<div class="notice"><b>일주일 안에 큐브가 모자라요.</b> '+shortSoon.map(([k,x])=>esc(labelKey(k))+' ('+mdShort(x.date)+' '+(x.i+1)+'끼부터)').join(", ")+'</div>';
+  if(!state.plan.size){html+='<div class="card empty">아직 식단이 없어요. 아래 + 버튼으로 날짜별 식단을 추가하세요.</div>';return html}
+  html+='<div class="gridwrap"><table class="pt"><thead><tr><th>날짜</th><th>끼</th><th>곡류</th><th>단백질</th><th>채소</th><th>과일·알레르기</th><th class="r">g</th><th>먹음</th></tr></thead><tbody>';
+  for(let ds=a;ds<=b;ds=addDays(ds,1)){
+    const p=state.plan.get(ds),dd=parse(ds);
+    const rc=(ds===t?" today":"")+(dd.getDay()===0?" sun":"")+(ds<t?" past":"");
+    const dcell='<td class="d" data-act="day" data-d="'+ds+'"><span class="dn">'+mdShort(ds)+'</span><span class="dw">'+WD[dd.getDay()]+'</span><span class="dd">'+esc(dayLabel(ds))+'</span></td>';
+    if(!p){html+='<tr id="row-'+ds+'" class="mrow blank'+rc+'" data-act="day" data-d="'+ds+'">'+dcell+'<td colspan="7">식단 없음 · 눌러서 추가</td></tr>';continue}
+    const ms=mealsOf(p);
+    ms.forEach((m,i)=>{
+      const etc=[];
+      if(!isBlank(m.fruit))etc.push('<span class="ln">'+esc(m.fruit)+'</span>');
+      allergensOf(m).forEach(a=>{const ai=D.aIdx.get(ds+"#"+i+"#"+a);etc.push('<span class="pill '+(ai===1?"bad":"honey")+'">'+esc(a)+' '+(ai===1?"첫 도입":ai+"회")+'</span>')});
+      if(!isBlank(m.newFood))etc.push('<span class="pill accent">새 재료 '+esc(m.newFood)+'</span>');
+      if(m.ate)etc.push('<span class="sub">먹은 양 '+esc(m.ate)+'g</span>');
+      if(m.memo)etc.push('<span class="sub">'+esc(m.memo)+'</span>');
+      html+='<tr '+(i===0?'id="row-'+ds+'" ':'')+'class="mrow'+rc+(m.done?" done":"")+'" data-act="day" data-d="'+ds+'">'+(i===0?dcell.replace('<td class="d"','<td class="d" rowspan="'+ms.length+'"'):"")+
+        '<td class="k">'+(i+1)+'끼</td>'+
+        '<td>'+cellLines([m.grain],ds,i)+'</td>'+
+        '<td>'+cellLines([m.protein],ds,i)+'</td>'+
+        '<td>'+cellLines(m.veg||[],ds,i)+'</td>'+
+        '<td><div class="etc">'+(etc.join("")||'<span class="sub">–</span>')+'</div></td>'+
+        '<td class="g">'+(mealGrams(m)||"")+'</td>'+
+        '<td class="ckc"><button class="ck'+(m.done?" on":"")+'" data-act="done" data-d="'+ds+'" data-i="'+i+'" aria-pressed="'+(m.done?"true":"false")+'" aria-label="'+md(ds)+' '+(i+1)+'끼 먹음">'+(m.done?"✓":"")+'</button></td></tr>';
     });
-  });
-  html+='<div class="xl-wrap" style="border:0"><table class="xl cube"><thead><tr><th>만든 날</th><th>재료</th><th>1개 용량</th><th>만든 개수</th><th>큐브</th><th>남음</th><th>상태</th><th>메모</th></tr></thead><tbody>'+(body||'<tr><td colspan="8" class="empty">남은 큐브가 없어요.</td></tr>')+'</tbody></table></div>';
-  if(goneN)html+='<div style="padding:8px 10px"><button class="btn small" data-act="togglegone">'+(state.showGone?"다 먹은 묶음 숨기기":"다 먹은 묶음 "+goneN+"개 보기")+'</button></div>';
-  html+='</div><span class="sub">재료 이름을 누르면 용량·개수·메모를 고칠 수 있어요. 만든 지 '+OLD_DAYS+'일이 지난 큐브는 "먼저 쓰기"로 표시돼요.</span>';
+  }
+  html+='</tbody></table></div><span class="sub">행을 누르면 그날 식단을 고칠 수 있어요. 먹음을 체크하면 들어간 큐브가 재고에서 빠지고, 빨간 글씨는 그 끼니 때 큐브가 모자란다는 뜻이에요.</span>';
+  return html;
+}
+
+/* cube views (표 / 칸) */
+function cubeLayoutToggle(){
+  const L=state.cubeLayout;
+  return '<div class="seg" role="group" aria-label="보기 방식"><button data-act="clayout" data-v="table" class="'+(L==="table"?"on":"")+'">표</button><button data-act="clayout" data-v="card" class="'+(L==="card"?"on":"")+'">칸</button></div>';
+}
+function viewCube(){
+  let totalLeft=0;state.cubes.forEach(c=>totalLeft+=left(c));
+  let html='<div class="row between"><span class="pill accent">남은 큐브 '+totalLeft+'개</span>'+cubeLayoutToggle()+'</div>';
+  if(!state.cubes.size)return html+'<div class="card empty">아직 등록된 큐브가 없어요.<br>아래 + 버튼으로 만든 큐브를 추가하세요.</div>';
+  const byDate=new Map();state.cubes.forEach(c=>{if(!byDate.has(c.made))byDate.set(c.made,[]);byDate.get(c.made).push(c)});
+  const dates=[...byDate.keys()].sort();let goneN=0;
+  if(state.cubeLayout==="table"){
+    let body="";
+    dates.forEach(ds=>{
+      const items=byDate.get(ds).sort((a,b)=>(a.order||0)-(b.order||0)||a.name.localeCompare(b.name));
+      const anyLeft=items.some(c=>left(c)>0);if(!anyLeft){goneN++;if(!state.showGone)return}
+      const age=diffDays(ds,D.t);
+      const agePill=!anyLeft?'<span class="pill muted">다 먹음</span>':age>=OLD_DAYS?'<span class="pill warn">'+age+'일째 · 먼저 쓰기</span>':'<span class="pill accent">'+age+'일째</span>';
+      body+='<tr class="grp"><td colspan="4"><div class="row between"><span class="batch-date">'+md(ds)+' 제작</span>'+agePill+'</div></td></tr>';
+      items.forEach(c=>{
+        const l=left(c),u=c.used||0;
+        const st=l===0?'<span class="pill muted">다 씀</span>':l<=LOW_LEFT?'<span class="pill warn">곧 소진</span>':'<span class="pill good">있음</span>';
+        body+='<tr class="'+(l===0?"gone":"")+'"><td><button class="nmb" data-act="editcube" data-id="'+c.id+'">'+esc(c.name)+(c.size?'<small>'+esc(c.size)+'g</small>':'')+'</button>'+(c.note?'<span class="inote2">'+esc(c.note)+'</span>':'')+'</td>'+
+          '<td class="r"><b>'+l+'</b><span class="sub"> / '+c.total+'</span><div class="bar" aria-hidden="true"><span style="width:'+(c.total?Math.round(l/c.total*100):0)+'%"></span></div></td><td>'+st+'</td>'+
+          '<td class="r"><span class="stepper"><button data-act="used" data-id="'+c.id+'" data-n="1" '+(l===0?"disabled":"")+' aria-label="'+esc(c.name)+' 1개 사용 (남음 −1)">−</button><button data-act="used" data-id="'+c.id+'" data-n="-1" '+(u===0?"disabled":"")+' aria-label="'+esc(c.name)+' 1개 되돌리기 (남음 +1)">+</button></span></td></tr>';
+      });
+    });
+    html+='<div class="gridwrap"><table class="ct"><thead><tr><th>재료</th><th class="r">남음</th><th>상태</th><th class="r">남음 조절</th></tr></thead><tbody>'+(body||'<tr><td colspan="4" class="empty">남은 큐브가 없어요.</td></tr>')+'</tbody></table></div>';
+    html+='<span class="sub" style="margin:0 16px">− 는 1개 사용(남음 줄이기), + 는 되돌리기(남음 늘리기). 재료 이름을 누르면 용량·개수를 고칠 수 있어요.</span>';
+  }else{
+    let active="",gone="";
+    dates.forEach(ds=>{
+      const items=byDate.get(ds).sort((a,b)=>(a.order||0)-(b.order||0)||a.name.localeCompare(b.name));
+      const anyLeft=items.some(c=>left(c)>0);const age=diffDays(ds,D.t);
+      const agePill=!anyLeft?'<span class="pill muted">다 먹음</span>':age>=OLD_DAYS?'<span class="pill warn">'+age+'일째 · 먼저 쓰기</span>':'<span class="pill accent">'+age+'일째</span>';
+      let card='<div class="card"><div class="batch-head"><span class="batch-date">'+md(ds)+' 제작</span>'+agePill+'</div>';
+      items.forEach(c=>{
+        const l=left(c);let dots="";
+        for(let i=0;i<c.total;i++)dots+='<button class="dot'+(c.shape==="square"?" sq":"")+(i<(c.used||0)?" used":"")+'" data-act="dot" data-id="'+c.id+'" data-i="'+i+'" aria-label="'+esc(c.name)+' '+(i+1)+'번째"></button>';
+        card+='<div class="item"><div class="item-top"><span class="iname'+(l===0?" gone":"")+'">'+esc(c.name)+(c.size?"<sup>"+esc(c.size)+"g</sup>":"")+'</span><span class="row"><span class="count"><b>'+l+'</b> / '+c.total+'</span><button class="icon-btn" data-act="editcube" data-id="'+c.id+'" aria-label="'+esc(c.name)+' 수정">✎</button></span></div>'+(c.note?'<div class="inote">'+esc(c.note)+'</div>':'')+'<div class="dots">'+dots+'</div></div>';
+      });
+      card+='</div>';
+      if(anyLeft)active+=card;else{gone+=card;goneN++}
+    });
+    html+=active+(state.showGone?gone:"");
+  }
+  if(goneN)html+='<button class="btn" data-act="togglegone">'+(state.showGone?"다 먹은 묶음 숨기기":"다 먹은 묶음 "+goneN+"개 보기")+'</button>';
   return html;
 }
 
 function viewStock(){
   const t=D.t;
   const keys=new Set([...D.rem.keys(),...D.needAll.keys()]);
-  let html='<div class="panel"><div class="band title">필요수량</div><div class="ctrl" style="padding:8px 10px;justify-content:space-between"><span class="sub">오늘부터 아직 안 먹은 끼니 기준</span><div class="seg" role="group" aria-label="기간">'+
+  let html='<div class="row between"><span class="sub">필요수량 기준</span><div class="seg" role="group" aria-label="기간">'+
     [["7","7일"],["14","14일"],["30","30일"],["all","전체"]].map(([v,l])=>'<button data-act="win" data-v="'+v+'" class="'+(state.win===v?"on":"")+'">'+l+'</button>').join("")+'</div></div>';
-  if(!keys.size)return html+'<div class="empty">큐브나 식단을 넣으면 여기서 필요수량을 계산해요.</div></div>';
+  if(!keys.size)return html+'<div class="card empty">큐브나 식단을 넣으면 여기서 필요수량을 계산해요.</div>';
   const rows=[...keys].map(k=>{
-    const [nm,sz]=k.split("|");const r=D.rem.get(k)||0,need=D.needWin.get(k)||0,after=r-need;const fs=D.firstShort.get(k);
+    const r=D.rem.get(k)||0,need=D.needWin.get(k)||0,after=r-need;const fs=D.firstShort.get(k);
     let st,cls,rank;
-    if(after<0){st="만들기";cls="bad";rank=0}
+    if(after<0){st=(-after)+"개 더 필요";cls="bad";rank=0}
     else if(!D.needAll.get(k)){if(r===0){st="없음";cls="muted";rank=6}else{st="남음";cls="accent";rank=5}}
     else if(fs&&fs.date<=addDays(t,13)){st="곧 부족";cls="warn";rank=1}
     else if(fs){st=mdShort(fs.date)+"부터 부족";cls="warn";rank=3}
@@ -621,35 +610,40 @@ function viewStock(){
     else{st="충분";cls="good";rank=4}
     let until;
     if(!D.needAll.get(k))until='<span class="sub">식단에 없음</span>';
-    else if(fs)until=(r===0?'<b>지금 없음</b>':mdShort((D.lastOk.get(k)||{}).date||t)+'까지')+' <small class="sub">('+mdShort(fs.date)+' '+(fs.i+1)+'끼부터 부족)</small>';
+    else if(fs)until=(r===0?'<b>지금 없음</b>':mdShort((D.lastOk.get(k)||{}).date||t)+'까지')+'<span class="inote2">'+mdShort(fs.date)+' '+(fs.i+1)+'끼부터 부족</span>';
     else until='<span class="sub">식단 끝까지 충분</span>';
-    return {k,nm,sz,cat:catOf(nm),r,need,lackN:Math.max(0,-after),st,cls,rank,until};
-  });
+    return {k,r,need,st,cls,rank,until};
+  }).sort((a,b)=>a.rank-b.rank||a.k.localeCompare(b.k));
   const make=rows.filter(x=>x.rank===0);
-  if(make.length)html+='<div class="notice" style="border-left:0;border-right:0"><b>만들 차례:</b> '+make.map(x=>esc(labelKey(x.k))+' '+x.lackN+'개').join(", ")+'</div>';
-  html+='<div class="xl-wrap" style="border:0"><table class="xl need"><thead><tr><th class="th">구분</th><th class="th">재료</th><th class="th">1개 용량</th><th class="th">남은 큐브</th><th class="th">필요</th><th class="th">부족</th><th class="th">소진 예상</th><th class="th">상태</th></tr></thead><tbody>';
-  CATS.forEach(c=>{
-    const rs=rows.filter(x=>x.cat===c).sort((a,b)=>a.rank-b.rank||a.k.localeCompare(b.k));if(!rs.length)return;
-    rs.forEach((x,j)=>{
-      html+='<tr>'+(j===0?'<td class="grp" rowspan="'+rs.length+'">'+c+'</td>':'')+'<td class="k">'+esc(x.nm)+'</td><td>'+(x.sz?x.sz+"g":'<span class="dash">–</span>')+'</td><td class="rem">'+x.r+'</td><td class="'+(x.need?"req":"zero")+'">'+(x.need||"–")+'</td><td class="'+(x.lackN?"lack":"zero")+'">'+(x.lackN||"–")+'</td><td style="text-align:left">'+x.until+'</td><td><span class="pill '+x.cls+'">'+x.st+'</span></td></tr>';
-    });
-  });
-  html+='</tbody></table></div></div><span class="sub">곡류 60g처럼 큐브 여러 개가 드는 칸은 등록된 큐브 용량(예: 쌀 30g)으로 나눠 계산해요. 용량이 없는 큐브는 15g으로 봐요.</span>';
+  if(make.length)html+='<div class="notice"><b>만들 차례:</b> '+make.map(x=>esc(labelKey(x.k))+' '+(x.need-x.r)+'개').join(", ")+'</div>';
+  html+='<div class="gridwrap"><table class="tbl"><thead><tr><th>재료</th><th class="r">남음</th><th class="r">필요</th><th>소진 예상</th><th>상태</th></tr></thead><tbody>';
+  rows.forEach(x=>{const [n,s]=x.k.split("|");
+    html+='<tr><td class="nm">'+esc(n)+(s?'<small>'+esc(s)+'g</small>':'')+'</td><td class="r"><b>'+x.r+'</b></td><td class="r">'+(x.need||"–")+'</td><td>'+x.until+'</td><td><span class="pill '+x.cls+'">'+x.st+'</span></td></tr>'});
+  html+='</tbody></table></div><span class="sub">필요는 오늘부터 고른 기간 안의, 아직 안 먹은 끼니 기준이에요. 곡류 60g처럼 큐브 여러 개가 드는 칸은 등록된 큐브 용량(예: 쌀 30g)으로 나눠 계산해요.</span>';
   return html;
 }
 
 function viewAllergy(){
-  let html='<div class="band title" style="border:1px solid var(--line)">알레르기 기록</div><span class="sub">지난 날짜 식단과 먹음 체크한 끼니를 먹은 것으로 세요. 초록 칸이 먹은 날, 파란 칸이 오늘, 흰 칸이 예정이에요.</span>';
-  html+=allergyTable(null,null,"🥄 알레르기 식품 노출 · 날짜 & 횟수");
-  const notYet=ALLERGENS.filter(a=>!D.aStats.has(a));
-  if(notYet.length)html+='<span class="sub">아직 식단에 없는 알레르기 식품: '+notYet.map(esc).join(", ")+'</span>';
-  const fr=[...D.firsts.entries()].sort((a,b)=>a[1].first.localeCompare(b[1].first));
-  html+='<div class="panel"><div class="band sec">🥕 재료 도입 기록</div><div class="xl-wrap" style="border:0"><table class="xl rec"><thead><tr><th class="th">구분</th><th class="th">재료</th><th class="th">첫 등장</th><th class="th">먹은 횟수</th><th class="th">도입</th><th class="th">다음 예정</th></tr></thead><tbody>';
-  fr.forEach(([n,f])=>{
-    html+='<tr><td>'+catOf(n)+'</td><td class="k">'+esc(n)+'</td><td>'+mdShort(f.first)+'</td><td class="'+(f.ateCount?"rem":"zero")+'">'+(f.ateCount||"–")+'</td><td class="chk">'+(f.ateCount?'<span style="color:var(--good)">☑</span>':'□')+'</td><td>'+(f.next?mdShort(f.next):'<span class="dash">–</span>')+'</td></tr>';
+  const t=D.t;
+  let html='<h2 class="sec">알레르기 노출 기록</h2><span class="sub">지난 날짜 식단과 먹음 체크한 끼니를 먹은 것으로 세요. 초록 칸이 먹은 날, 테두리만 있는 칸이 예정이에요.</span>';
+  const list=ALLERGENS.concat([...D.aStats.keys()].filter(a=>!ALLERGENS.includes(a)));
+  html+='<div class="gridwrap"><table class="tbl"><thead><tr><th>알레르기</th><th class="r">먹음</th><th>첫 도입</th><th>날짜</th></tr></thead><tbody>';
+  list.forEach(a=>{
+    const xs=D.aStats.get(a)||[];const ate=xs.filter(x=>x.ate);
+    const first=xs[0];
+    html+='<tr><td class="nm">'+esc(a)+'</td><td class="r"><b>'+ate.length+'</b>'+(xs.length>ate.length?'<span class="sub"> +'+(xs.length-ate.length)+'</span>':'')+'</td>'+
+      '<td>'+(first?mdShort(first.date):'<span class="sub">–</span>')+'</td>'+
+      '<td><div class="dchips">'+xs.map((x,j)=>'<span class="dchip'+(x.ate?" ate":"")+(j===0?" first":"")+'">'+mdShort(x.date)+(x.i?"·2":"")+'</span>').join("")+'</div></td></tr>';
   });
-  if(!fr.length)html+='<tr><td colspan="6" class="empty">식단을 넣으면 재료가 여기 쌓여요.</td></tr>';
-  html+='</tbody></table></div></div>';
+  html+='</tbody></table></div>';
+  html+='<h2 class="sec">재료 도입 기록</h2><span class="sub">식단에 들어간 재료가 처음 나온 날이에요. 먹음 칸은 지난 식단과 체크한 끼니 기준.</span>';
+  const fr=[...D.firsts.entries()].sort((a,b)=>a[1].first.localeCompare(b[1].first));
+  html+='<div class="gridwrap"><table class="tbl"><thead><tr><th>재료</th><th>첫 등장</th><th class="r">먹은 횟수</th><th>상태</th></tr></thead><tbody>';
+  fr.forEach(([n,f])=>{
+    const st=f.ateCount?'<span class="pill good">도입 완료</span>':f.next?'<span class="pill accent">'+mdShort(f.next)+' 예정</span>':'<span class="pill muted">미정</span>';
+    html+='<tr><td class="nm">'+esc(n)+'</td><td>'+mdShort(f.first)+'</td><td class="r">'+(f.ateCount||"–")+'</td><td>'+st+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
   return html;
 }
 
@@ -821,8 +815,6 @@ document.addEventListener("click",e=>{
   else if(act==="used"){const c=state.cubes.get(a.dataset.id);if(c){save("cubes",Object.assign({},c,{used:Math.min(c.total,Math.max(0,(c.used||0)+(+a.dataset.n)))}));render()}}
   else if(act==="editcube")cubeSheet(a.dataset.id);
   else if(act==="togglegone"){state.showGone=!state.showGone;render()}
-  else if(act==="shop"){const s=Object.assign({},S(),{id:"main"});const set=new Set(s.shop||[]);const v=a.dataset.v;set.has(v)?set.delete(v):set.add(v);s.shop=[...set];save("settings",s);render()}
-  else if(act==="shopclear"){save("settings",Object.assign({},S(),{id:"main",shop:[]}));render()}
 });
 document.getElementById("fab").addEventListener("click",()=>{
   if(state.tab==="plan"){const days=[...state.plan.keys()].sort();const nd=days.length?addDays(days[days.length-1],1):today();dayEditor(nd)}
@@ -848,7 +840,7 @@ function copyInvite(){
 }
 function renderWelcome(){
   document.getElementById("fab").style.visibility="hidden";document.getElementById("settingsBtn").style.visibility="hidden";
-  document.getElementById("infoRow").innerHTML="";document.getElementById("sync").textContent=FIREBASE_CONFIG?"시작 전":"Firebase 설정 필요";
+  document.getElementById("todayLabel").textContent="";document.getElementById("sync").textContent=FIREBASE_CONFIG?"시작 전":"Firebase 설정 필요";
   document.getElementById("view").innerHTML='<div class="group" style="padding:20px 16px"><b style="font-size:20px">가족 공간 만들기</b><p class="sub" style="font-size:15px;margin:8px 0 16px">식단표와 큐브 현황을 가족이 함께 쓰는 공간을 만들어요. 다른 가족이 이미 만들었다면 그 사람에게 받은 초대 링크로 들어오세요.</p>'+
     '<button class="btn primary" data-act="create" style="width:100%;padding:12px">새 가족 공간 만들기</button></div>'+
     '<div><div class="grouphead">초대 코드로 들어가기</div><div class="group"><div class="field"><label for="w-code">초대 코드</label><input id="w-code" placeholder="초대 링크의 f= 뒤 글자"></div><button class="rowbtn" data-act="join">들어가기</button></div></div>';
